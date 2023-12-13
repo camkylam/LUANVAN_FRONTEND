@@ -5,7 +5,7 @@ import Pagination from "../../components/table/pagination.vue";
 import Dropdown from "../../components/form/dropdown.vue";
 import Select from "../../components/form/select.vue";
 // import Assessment from "../introduction/assessment_form.vue";
-import Add from "../comment/add.vue";
+import Add from "../opinion/add.vue";
 import CommentForm from "../introduction/assessment_form.vue";
 import Select_Advanced from "../../components/form/select_advanced.vue";
 import Opinion from "../../services/opinion.service";
@@ -23,7 +23,7 @@ import Comment from "../../services/comment.service";
 
 import { partymemberModel, recommedationModel, recommenwardsModel, opinionModel, commentModel, CommentByIdModel, AllCommentModel } from "../../assets/js/models"
 import { formatDate, searchData, updateItems, updateRows, setNumberOfPages, setPagination } from "../../assets/js/common";
-import { comfirmComment,signedComment } from "../../use/getSessionItem";
+import { comfirmComment,signedComment, isComfirmOpinion} from "../../use/getSessionItem";
 export default {
   components: {
     Table,
@@ -39,37 +39,38 @@ export default {
     setup(ctx){
       const data = reactive({
         addValue: partymemberModel,
-          click: true,
+        click: true,
       })
       const router = useRouter();
       const route = useRoute();
+
       const recommendationId = route.params.id;
-      //console.log(params)
+      
+
       const refresh = async () => {
         const comments = await Opinion.getAllOpinionsByRecommendation({recommendationId})
-        // console.log(comments)
         if(!comments.error){
           data.comments = comments.document
-          // console.log(data.comments)
           for(const commentsItem of data.comments )
           commentsItem.createdAt = formatDate(commentsItem.createdAt)
         }
       }
       const goToFormOpinion = async(item) => {
         router.push({ name: 'CommentByOpinion', params: { id: `${item._id}` } });
-      // console.log("Navigating to Form.opinion with item:", item);
       };
 
-      // const add = async(value) => {
-      //   data.click = false
-      //   data.addValue = await PartyMember.get(params);
-      //   data.addValue.birthday = formatDate(data.addValue.birthday);
-      //   console.log(data.addValue)
-      // }
+      const add = async(value) => {
+        data.click = false
+        const idpartymember = await Recommentdation.getById(recommendationId)
+        const params = idpartymember.document.PartyMemberId
+        data.addValue = await PartyMember.get(params);
+        data.addValue.birthday = formatDate(data.addValue.birthday);
+        console.log( data.click)
+      }
+     
 
       const handleGetById = async(id, item) => {
         const rsPartyMember = await Opinion.getById(id)
-        // console.log(rsPartyMember)
         if(!rsPartyMember.error){
           data.OpinionById = rsPartyMember.document
           data.OpinionById.createdAt = formatDate(data.OpinionById.createdAt);
@@ -89,7 +90,8 @@ export default {
       refresh,
       handleGetById,
       goToFormOpinion,
-      //add
+      add,
+      isComfirmOpinion
     }
   }
 }
@@ -106,11 +108,11 @@ export default {
     <div class="border-hr mb-2"></div>
 
     <div class="d-flex menu my-2 mx-2 justify-content-end">
-      <!-- <button v-if="isComfirmOpinion()" type="button" class="btn btn-warning ml-3 mr-3" data-toggle="modal" data-target="#model-add"
+      <button v-if="isComfirmOpinion()" type="button" class="btn btn-warning ml-3 mr-3" data-toggle="modal" data-target="#model-add"
           @click="add">
           <span class="mx-2" style="color: white">Thêm phiếu xin ý kiến</span>
         </button>
-        <Add v-if= "!data.click" @add="(value) => {add(value);}" :item="data.addValue" /> -->
+        <Add v-if= "!data.click" @add="(value) => {add(value);}" :item="data.addValue" />
       <router-link
         :to="{ name: 'Introduction' }"
         @click="activeMenu = 1"

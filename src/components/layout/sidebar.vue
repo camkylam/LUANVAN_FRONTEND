@@ -210,53 +210,7 @@ export default {
         setActiveMenu,
       };
     }
-    else if (roleName == "đảng ủy quận huyện") {
-      const data = reactive({
-        sidebarToggle: true,
-        sidebarTasks: [
-          {
-            id: 1,
-            icon: "Home",
-            name_icon: "Trang chủ",
-            name: "Index",
-            role: [],
-            children: [],
-          },
-          {
-            id: 2,
-            icon: "dashboard_customize",
-            name_icon: "Thống kê",
-            name: "Dashboard",
-            role: [],
-            children: [],
-          },
-          {
-            id: 3,
-            icon: "account_circle",
-            name_icon: "Cập nhật thông tin cá nhân",
-            name: "Personal",
-            role: [],
-            children: [],
-          },
-          {
-            id: 4,
-            icon: "patient_list",
-            name_icon: "Thông tin Đảng viên cấp cơ sở",
-            name: "Bithucosoquanhuyen",
-            role: [],
-            children: [],
-          },
-        ]
-      });
-      const setActiveMenu = (value) => {
-        sessionStorage.setItem("activeMenu", value);
-      };
-      return {
-        slide,
-        data,
-        setActiveMenu,
-      };
-    }
+
     else {
       const data = reactive({
         sidebarToggle: true,
@@ -345,6 +299,7 @@ export default {
 }
 
 .img {
+  margin-top: 2rem;
   width: 250px;
 }
 
@@ -362,13 +317,16 @@ export default {
   cursor: pointer;
   /* border-radius: 5px; */
   color: rgb(14, 14, 15);
+  text-decoration: none;
 }
+
 
 .none-border-nav-item {
   width: 90%;
   cursor: pointer;
   border: none;
-  color: black
+  color: black;
+  text-decoration: none;
 }
 
 .border-icon {

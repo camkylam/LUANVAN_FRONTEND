@@ -26,19 +26,21 @@ export const searchData = (chooseSearch, items) => {
   switch (chooseSearch) {
     case "name":
       return items.map((value, index) => {
-        return [value.name].join("").toLocaleLowerCase();
+        return [value.name].join("").toLocaleLowerCase() || [value.PartyMember.name].join("").toLocaleLowerCase();
       });
     case "email":
       return items.map((value, index) => {
-        return [value.email].join("").toLocaleLowerCase();
+        return [value.email].join("").toLocaleLowerCase() || [value.PartyMember.email].join("").toLocaleLowerCase();
       });
     case "phone":
       return items.map((value, index) => {
-        return [value.phone].join("").toLocaleLowerCase();
+        return [value.phone].join("").toLocaleLowerCase() || [value.PartyMember.phone].join("").toLocaleLowerCase();
       });
     case "partycell":
       return items.map((value, index) => {
-        return [value.PartyCell.name].join("").toLocaleLowerCase();
+        const partyCellName = value.PartyCell ? value.PartyCell.name : "";
+        const partyMemberPartyCellName = value.PartyMember?.PartyCell?.name || "";
+        return [partyCellName, partyMemberPartyCellName].join("").toLocaleLowerCase();
       });
     default:
       return items.map((value, index) => {
@@ -93,7 +95,7 @@ export const setPagination = (data, totalPages, filtered) => {
     default:
       items = data.items
   }
-  console.log(data.itemType, items)
+ 
 
   if (items?.length > 0) {
     if (totalPages.value == 0 || data.entryValue == "All") {

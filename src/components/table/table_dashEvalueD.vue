@@ -36,7 +36,7 @@
       },
       fields: {
         type: Array,
-        default: ["Name", "Age", "Payment"],
+        default: [],
       },
     },
     data() {

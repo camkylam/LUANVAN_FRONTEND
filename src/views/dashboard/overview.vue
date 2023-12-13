@@ -2,9 +2,9 @@
 import { ref, reactive, computed, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Pagination from "../../components/table/pagination.vue";
+import CommentForm from "../introduction/assessment_form.vue";
 import Search from "../../components/form/search.vue";
 import Select from "../../components/form/select.vue";
-import CommentForm from "../introduction/assessment_form.vue";
 import Box from "../../components/box/box.vue";
 import SelectOption from "../../components/box/select.vue";
 import moment from "moment";
@@ -20,10 +20,15 @@ import TableEvalueB from "../../components/table/table_dashEvalueB.vue";
 import TableEvalueC from "../../components/table/table_dashEvalueC.vue";
 import TableEvalueD from "../../components/table/table_dashEvalueD.vue";
 import TableEvalueE from "../../components/table/table_dashEvalueE.vue";
+import TableEvalueT from "../../components/table/table_dashEvalueT.vue";
+import TableEvalueG from "../../components/table/table_dashEvalueG.vue";
+import TableEvalueH from "../../components/table/table_dashEvalueH.vue";
+import Introduction from "../introduction/introduction_form.vue";
+import View from "../introduction/view.vue";
 import TableCommentYear from "../../components/table/table_CommentByYear.vue";
 import TableMeet from "../../components/table/table_dashmeet.vue";
 import { formatDate, searchData, updateItems, updateRows, setNumberOfPages, setPagination } from "../../assets/js/common";
-import { partymemberModel, recommedationModel, recommenwardsModel, opinionModel, RecommendationByIdModel,DashRecommementStatus,DashYeareValuation } from "../../assets/js/models"
+import { partymemberModel, DashYeareValuationTrue,recommedationModel, recommenwardsModel, opinionModel, RecommendationByIdModel,DashRecommementStatus,DashYeareValuation,  CommentByIdModel} from "../../assets/js/models"
 import { http_getAll, http_create, http_getOne, http_deleteOne, http_update } from "../../assets/js/common.http";
 import { alert_success, alert_error, alert_delete, alert_warning, alert_delete_wide } from "../../assets/js/common.alert";
 import Index from "../CommentByYear/index.vue";
@@ -45,53 +50,70 @@ export default {
     TableEvalueC,
     TableEvalueD,
     TableEvalueE,
+    TableEvalueT,
+    TableEvalueG,
+    TableEvalueH,
     TableCommentYear,
     CommentForm,
-    TableMeet
+    TableMeet,
+    View,
+    Introduction
   },
   setup() {
     const data = reactive({
-      items: [
-        partymemberModel,
-      ],
-      viewValue: partymemberModel,
-      activeEdit: false,
-      entryValue: 5,
-      numberOfPages: 1,
-      totalRow: 0,
-      startRow: 0,
-      endRow: 0,
-      currentPage: 1,
-      searchText: "",
-      activeMenu: 1,
-      activeSelectAll: false,
-      activeEdit: false,
-      addValue: {},
-      entryType: "",
-      selectAll: [
-        {
-          checked: false,
-        },
-      ],
-      lengthPartymember: 0,
-      lengthRecommendation: 0,
-      lengthRecommendationStatus: 0,
-      partymember: partymemberModel,
-      yetrecommendation: partymemberModel,
-      acceptRecommendation: DashRecommementStatus,
-      activeTable: "",
-      yearInputValueEvaluation: '',
-      Evaluation: DashYeareValuation,
-      commentYear: DashYeareValuation,
-      Meet: DashYeareValuation
-    });
-   
-    const view = async (value) => {
-      // FIND ONE PartyMember
-      data.viewValue = await PartyMember.get(value);
-      data.viewValue.birthday = formatDate(data.viewValue.birthday);
-    };
-    const router = useRouter();
+
+items: [
+  partymemberModel,
+],
+viewValue: partymemberModel,
+activeEdit: false,
+entryValue: 5,
+numberOfPages: 1,
+totalRow: 0,
+startRow: 0,
+endRow: 0,
+currentPage: 1,
+searchText: "",
+activeMenu: 1,
+activeSelectAll: false,
+activeEdit: false,
+addValue: {},
+entryType: "",
+selectAll: [
+  {
+    checked: false,
+  },
+],
+lengthPartymember: 0,
+lengthRecommendation: 0,
+lengthRecommendationStatus: 0,
+lengthCommentYear: 0,
+partymember: partymemberModel,
+yetrecommendation: partymemberModel,
+acceptRecommendation: DashRecommementStatus,
+activeTable: "",
+yearInputValueEvaluation: '',
+Evaluation: DashYeareValuation,
+commentYear: DashYeareValuation,
+CommentYearTrue: DashYeareValuationTrue,
+EvaluationTrue: DashYeareValuationTrue,
+commentById: CommentByIdModel,
+introValue: partymemberModel,
+Meet: DashYeareValuation
+});
+
+const view = async (value) => {
+// FIND ONE PartyMember
+data.viewValue = await PartyMember.get(value);
+data.viewValue.birthday = formatDate(data.viewValue.birthday);
+};
+const router = useRouter();
+const renewIntro = async (value) => {
+router.push({ name: "Form.recommendation", params: { id: `${value}` } });
+data.introValue = await PartyMember.get(value);
+const recommendation = await Recommentdation.get(data.introValue._id)
+
+};
     
     //refresh
     const refresh = async () => {
@@ -111,7 +133,6 @@ export default {
           ]
       data.partymember = await PartyMember.getAllByCell({ cellIds })
       data.lengthPartymember = data.partymember?.length;
-      // console.log(data.lengthPartymember)
 
       let partyCellIds=[]
       partyCellIds = ["07b75908-48b0-4263-b3ae-9ed7eac664be", // Value 1
@@ -130,6 +151,7 @@ export default {
       data.yetrecommendation = yetrecommendation.document
       console.log(data.lengthRecommendation )
 
+
       let status=[]
       let partyCellId = []
       partyCellId = ["07b75908-48b0-4263-b3ae-9ed7eac664be", // Value 1
@@ -143,31 +165,44 @@ export default {
             "be9f8e33-43e5-4e20-a4cb-4d67b81819b3",
             "aa8471f4-4e53-457b-b234-f14957e79e6c"
           ]
-      status = ['confirmed','created'];
+      //status = ['confirmed'];
+      status = ['created']
       const recommendations = await Recommentdation.getAllByStatusWithPartycell({status, partyCellId})
       data.lengthRecommendationStatus = recommendations?.document?.length
       data.acceptRecommendation =  recommendations?.document
-      // console.log(data.acceptRecommendation)
+
+      const yearInputValue = data.yearInputValueComment;
+      const year = yearInputValue;
+      console.log(year )
+
+      const yearInputValueEvaluation = data.yearInputValueEvaluation
+      const yeartrue = yearInputValueEvaluation
+      const yearfalse = yearInputValueEvaluation
+
+      const yearInputMeet = data.yearInputValueMeet
+      const yearmeet = yearInputMeet
+
       
-      const yearInputValue = data.yearInputValueEvaluation;
-      const year = yearInputValue
-      
-      // console.log(yearInputValue)
       const evaluation = await commentService.getByYearAndPartyCell({year,partyCellIds})
-      data.Evaluation = evaluation.criterionEvaluationNameCounts
+      data.lengthCommentYear = evaluation?.document?.length
       data.commentYear = evaluation.document
 
-      // console.log(data.commentYear)
-      const meet = await commentService.getByYearAndPartyCellAndMeet({year, partyCellIds})
+      const evaluationFalse = await commentService.getByYearAndPartyCellExemptionFalse({yearfalse,partyCellIds})
+      data.Evaluation = evaluationFalse.criterionEvaluationNameCounts
+
+      const evaluationTrue = await commentService.getByYearAndPartyCellExemptionTrue({yeartrue,partyCellIds})
+      data.EvaluationTrue = evaluationTrue.criterionEvaluationCountsByCriterion
+      data.CommentYearTrue = evaluationTrue.document
+
+      const meet = await commentService.getByYearAndPartyCellAndMeet({yearmeet, partyCellIds})
       data.Meet = meet.document
-      // console.log(data.Meet)
+
 
     };
     const handleGetById = async (id, item) => {
     const rsPartyMember = await commentService.getById(id)
     if(!rsPartyMember.error){
       data.commentById = rsPartyMember.document
-      // console.log(data.commentById)
       data.commentById.createdAt = formatDate(data.commentById.createdAt)
     }
      else {
@@ -176,33 +211,53 @@ export default {
   };
     const handleBoxClick = (boxType) => {
       data.activeTable = boxType;
-      // console.log(data.activeTable)
     };
     onMounted(async () => {
       await refresh();
     });
     const onFormSubmit = async () => {
-      // Validate the year input
-      const yearInput = parseInt(data.yearInputValueEvaluation);
-      
-      if (isNaN(yearInput) || yearInput < 0) {
-        // Show an error message for invalid input
-        alert_error("Năm không hợp lệ");
-        return;
-      }
+     
+     const yearInputComment = parseInt(data.yearInputValueComment);
+    
+     console.log("Evaluation Year:", data.yearInputValueEvaluation);
+  console.log("Comment Year:", data.yearInputValueComment);
+  console.log("Meet Year:", data.yearInputValueMeet);
+     
+     
+     if (isNaN(yearInputComment) || yearInputComment < 0) {
+       alert_error("Năm không hợp lệ");
+       return;
+     }
 
-      // Continue with the refresh logic
-      await refresh();
-    };
+     await refresh();
+   };
+   const onFormSubmitEvaluation = async () => {
+    const yearInputEvaluation = parseInt(data.yearInputValueEvaluation);
+    if (isNaN(yearInputEvaluation) || yearInputEvaluation < 0) {
+      alert_error("Năm không hợp lệ");
+      return;
+    }
+    await refresh();
+  };
+  const onFormSubmitMeet = async () => {
+    const yearInputMeet = parseInt(data.yearInputValueMeet);
+    if (isNaN(yearInputMeet) || yearInputMeet < 0) {
+      alert_error("Năm không hợp lệ");
+      return;
+    }
+    await refresh();
+  };
 
-
-    return {
-      data,
-      handleBoxClick,
-      view,
-      onFormSubmit,
-      handleGetById
-    };
+   return {
+     data,
+     handleBoxClick,
+     view,
+     onFormSubmit,
+     onFormSubmitEvaluation,
+     onFormSubmitMeet,
+     handleGetById,
+     renewIntro
+   };
   },
 };
 </script>
@@ -212,7 +267,7 @@ export default {
       <!-- BTN tổng quan chi tiêt -->
       <div class="d-flex menu mx-2 my-2 justify-content-end">
         <a class="active-menu">
-          <span class="size-17 active-menu">Tổng quan</span>
+          <span class="size-17 active-menu">Thống kê</span>
         </a>
       </div>
     </div>
@@ -229,7 +284,7 @@ export default {
     <hr>
     <!-- Table -->
     <div v-if="data.activeTable === 'partymember'">
-      <p style="font-size: 25px; text-align: center;">ĐẢNG VIÊN TRONG CHI BỘ</p>
+      <p style="font-size: 25px; text-align: center; font-family: 'Times New Roman', Times, serif; font-weight: bold; padding-top: 25px; padding-bottom: 25px;">ĐẢNG VIÊN TRONG TRƯỜNG CNTT VÀ TT</p>
       <Table
         :partymember="data.partymember"
         :fields="[
@@ -254,7 +309,7 @@ export default {
       />
     </div>
     <div v-if="data.activeTable === 'recommendation'">
-      <p style="font-size: 25px; text-align: center;">ĐẢNG VIÊN TRONG CHI BỘ CHƯA CÓ THƯ GIỚI THIỆU</p>
+      <p style="font-size: 25px; text-align: center; font-family: 'Times New Roman', Times, serif; font-weight: bold; padding-top: 25px; padding-bottom: 25px;">ĐẢNG VIÊN CHƯA CÓ THƯ GIỚI THIỆU</p>
       <TableRecommendation
         :items="setPages"
         :yetrecommendation = "data.yetrecommendation"
@@ -269,20 +324,13 @@ export default {
       'Quận, huyện',
       'Tỉnh, thành phố',
         ]"
+         @view="(value) => { view(value); }"
       />
-      <Pagination
-        :numberOfPages="data.numberOfPages"
-        :totalRow="data.totalRow"
-        :startRow="data.startRow"
-        :endRow="data.endRow"
-        :currentPage="data.currentPage"
-        @update:currentPage="(value) => (data.currentPage = value)"
-        class="mx-3"
-      />
+      <View :item="data.viewValue"></View>
     </div>
     <!-- TableYetAccept -->
     <div v-if="data.activeTable === 'recommendationstatus'">
-      <p style="font-size: 25px; text-align: center;">ĐẢNG VIÊN CHƯA ĐƯỢC CHẤP NHẬN SINH HOẠT NƠI CƯ TRÚ</p>
+      <p style="font-size: 25px; text-align: center; font-family: 'Times New Roman', Times, serif; font-weight: bold; padding-top: 25px; padding-bottom: 25px;">ĐẢNG VIÊN CHƯA ĐƯỢC CHẤP NHẬN SINH HOẠT NƠI CƯ TRÚ</p>
       <TableYetAccept
         :acceptRecommendation ="data.acceptRecommendation"
         :fields="[
@@ -295,34 +343,28 @@ export default {
           'Quận, huyện',
           'Tỉnh, thành phố',
         ]"
+          @view="(value) => { view(value); }"
+        @renewIntro="(value) => {renewIntro(value);}"
       />
-      <Pagination
-        :numberOfPages="data.numberOfPages"
-        :totalRow="data.totalRow"
-        :startRow="data.startRow"
-        :endRow="data.endRow"
-        :currentPage="data.currentPage"
-        @update:currentPage="(value) => (data.currentPage = value)"
-        class="mx-3"
-      />
+      <View :item="data.viewValue"></View>
     </div>
 
     <div v-if="data.activeTable === 'criterionEvaluation'">
-      <p style="font-size: 25px; text-align: center;">THỐNG KÊ</p>
-      <form @submit.prevent="onFormSubmit">
-      <p style="font-size: 17px; padding-left: 30px;">Tổng hợp phiếu nhận xét theo năm</p>
+      <p style="font-size: 25px; text-align: center; font-family: 'Times New Roman', Times, serif; font-weight: bold; padding-top: 25px; padding-bottom: 25px;">THỐNG KÊ TIÊU CHÍ ĐÁNH GIÁ NHẬN XÉT THEO NĂM</p>
+      <form @submit.prevent="onFormSubmitEvaluation">
       <div class="d-flex justify-content-between mx-3 mb-3">
         <div class="d-flex align-items-start">
-          <input v-model="data.yearInputValueEvaluation" ref="yearInput" id="yearInput" class="ml-3" style="width: 300px; border: 1px solid var(--gray); border-radius: 5px; position: relative; width: 200%; height: 100%;" placeholder="Nhập năm cần tổng hợp tiêu chí">
+          <input v-model="data.yearInputValueEvaluation" ref="yearInput" id="yearInput" class="ml-3" style="width: 300px; border: 1px solid var(--gray); border-radius: 5px; position: relative; width: 200%; height: 100%; margin-left: 80px;" placeholder="Nhập năm cần thống kê" required>
           <button type="submit" class="btn btn-info ml-3 mr-3" data-toggle="modal">
-            <span class="mx-2" style="color: white">Tổng hợp</span>
+            <span class="mx-2" style="color: white">Thống kê</span>
           </button>
         </div>
       </div>
     </form>
-  <div style="display: flex; justify-content: center; align-items: center;">
+    <p style="font-size: 20px; text-align: center; font-weight: bold; padding-bottom: 15px; padding-top: 15px;">Phiếu nhận xét đối với đảng viên không được miễn sinh hoạt nơi cư trú</p>
+  <div style="display: flex; justify-content: center; ">
 <!-- Bảng thứ nhất -->
-<div style="width: 45%;">
+<div style="width: 47%;">
   <TableEvalue
     :Evaluation="data.Evaluation"
     :fields="[
@@ -334,10 +376,10 @@ export default {
 </div>
 
 <!-- Dấu gạch đứng -->
-<div style="border-left: 1px solid black; height: 100px; margin: 0 10px;"></div>
+<div style="border-left: 1px solid white; height: 200px; margin: 0 10px;"></div>
 
 <!-- Bảng thứ hai -->
-<div style="width: 45%;">
+<div style="width: 47%;">
   <TabelEvalueA
     :Evaluation="data.Evaluation"
     :fields="[
@@ -349,9 +391,9 @@ export default {
 </div>
 
 </div>
-<div style="display: flex; justify-content: center; align-items: center;">
+<div style="display: flex; justify-content: center; ">
 <!-- Bảng thứ nhất -->
-<div style="width: 45%;">
+<div style="width: 47%;">
   
   <TableEvalueB
         :Evaluation ="data.Evaluation"
@@ -365,10 +407,9 @@ export default {
 </div>
 
 <!-- Dấu gạch đứng -->
-<div style="border-left: 1px solid black; height: 100px; margin: 0 10px;"></div>
-
+<div style="border-left: 1px solid white; height: 200px; margin: 0 10px;"></div>
 <!-- Bảng thứ hai -->
-<div style="width: 45%;">
+<div style="width: 47%;">
   
   <TableEvalueC
         :Evaluation ="data.Evaluation"
@@ -380,9 +421,9 @@ export default {
       /><br>
 </div>
 </div>
-<div style="display: flex; justify-content: center; align-items: center;">
+<div style="display: flex; justify-content: center; ">
 <!-- Bảng thứ nhất -->
-<div style="width: 45%;">
+<div style="width: 47%;">
   
       <TableEvalueD
         :Evaluation ="data.Evaluation"
@@ -395,10 +436,10 @@ export default {
 </div>
 
 <!-- Dấu gạch đứng -->
-<div style="border-left: 1px solid black; height: 100px; margin: 0 10px;"></div>
+<div style="border-left: 1px solid white; height: 200px; margin: 0 10px;"></div>
 
 <!-- Bảng thứ hai -->
-<div style="width: 45%;">
+<div style="width: 47%;">
  
       <TableEvalueE
         :Evaluation ="data.Evaluation"
@@ -410,18 +451,74 @@ export default {
       />
 </div>
 
+
+
+</div><br>
+
+<p style="font-size: 20px; text-align: center; font-weight: bold; padding-bottom: 15px; padding-top: 15px;">Phiếu nhận xét đối với đảng viên được miễn sinh hoạt nơi cư trú</p>
+<div style="display: flex; justify-content: center; align-items: center;">
+<!-- Bảng thứ nhất -->
+<div style="width: 47%;">
+      <TableEvalueT
+        :EvaluationTrue ="data.EvaluationTrue"
+        :fields="[
+          'Nêu gương tốt',
+          'Nêu gương',
+          'Chưa nêu gương'
+        ]"
+      />
 </div>
+
+<!-- Dấu gạch đứng -->
+<div style="border-left: 1px solid white; height: 200px; margin: 0 10px;"></div>
+
+<!-- Bảng thứ hai -->
+<div style="width: 47%;">
+ 
+      <TableEvalueG
+      :EvaluationTrue ="data.EvaluationTrue"
+        :fields="[
+          'Thực hiện tốt',
+          'Thực hiện',
+          'Chưa thực hiện'
+        ]"
+      />
+</div>
+
+
+
+</div><br>
+<div style="display: flex; justify-content: center; align-items: center;">
+<!-- Bảng thứ nhất -->
+<div style="width: 47%;">
+      <TableEvalueH
+        :EvaluationTrue ="data.EvaluationTrue"
+        :fields="[
+          'Thực hiện tốt',
+          'Thực hiện',
+          'Chưa thực hiện'
+        ]"
+      />
+</div>
+
+
+
+
+
+
+</div>
+<br>
+
     </div>
 
     <div v-if="data.activeTable === 'commentYear'">
-      <p style="font-size: 25px; text-align: center;">TỔNG HỢP PHIẾU NHẬN XÉT CỦA ĐẢNG VIÊN THEO NĂM</p>
+      <p style="font-size: 25px; text-align: center; font-family: 'Times New Roman', Times, serif; font-weight: bold; padding-top: 25px; padding-bottom: 25px;">THỐNG KÊ PHIẾU NHẬN XÉT CỦA ĐẢNG VIÊN THEO NĂM</p>
       <form @submit.prevent="onFormSubmit">
-      <p style="font-size: 17px; padding-left: 30px;">Tổng hợp phiếu nhận xét theo năm</p>
       <div class="d-flex justify-content-between mx-3 mb-3">
-        <div class="d-flex align-items-start">
-          <input v-model="data.yearInputValueEvaluation" ref="yearInput" id="yearInput" class="ml-3" style="width: 300px; border: 1px solid var(--gray); border-radius: 5px; position: relative; width: 200%; height: 100%;" placeholder="Nhập năm cần tổng hợp tiêu chí">
+        <div class="d-flex align-items-start" style="padding-bottom: 15px;">
+          <input v-model="data.yearInputValueComment" ref="yearInput" id="yearInput" class="ml-3" style="width: 300px; border: 1px solid var(--gray); border-radius: 5px; position: relative; width: 200%; height: 100%;" placeholder="Nhập năm cần thống kê" required>
           <button type="submit" class="btn btn-info ml-3 mr-3" data-toggle="modal">
-            <span class="mx-2" style="color: white">Tổng hợp</span>
+            <span class="mx-2" style="color: white">Thống kê</span>
           </button>
         </div>
       </div>
@@ -437,21 +534,19 @@ export default {
           'Xã, phường',
           'Quận, huyện',
           'Tỉnh, thành phố',
-        ]"  @getbyId="handleGetById"
-
+        ]" @getbyId="handleGetById"
       />
       <CommentForm :commentById='data.commentById' :criterion = "data.criterionValue" :item="data.commentValue"/>
     </div>
-    
+
     <div v-if="data.activeTable === 'meet'">
-      <p style="font-size: 25px; text-align: center;">TỔNG HỢP ĐẢNG VIÊN KHÔNG THAM GIA HỌP Ở ĐỊA PHƯƠNG</p>
-      <form @submit.prevent="onFormSubmit">
-      <p style="font-size: 17px; padding-left: 30px;">Tổng hợp đảng viên không tham gia họp ở địa phương</p>
+      <p style="font-size: 25px; text-align: center; font-family: 'Times New Roman', Times, serif; font-weight: bold; padding-top: 25px; padding-bottom: 25px;">THỐNG KÊ ĐẢNG VIÊN KHÔNG THAM GIA HỌP Ở ĐỊA PHƯƠNG</p>
+      <form @submit.prevent="onFormSubmitMeet">
       <div class="d-flex justify-content-between mx-3 mb-3">
-        <div class="d-flex align-items-start">
-          <input v-model="data.yearInputValueEvaluation" ref="yearInput" id="yearInput" class="ml-3" style="width: 300px; border: 1px solid var(--gray); border-radius: 5px; position: relative; width: 200%; height: 100%;" placeholder="Nhập năm cần tổng hợp tiêu chí">
+        <div class="d-flex align-items-start" style="padding-bottom: 15px;">
+          <input v-model="data.yearInputValueMeet" ref="yearInput" id="yearInput" class="ml-3" style="width: 300px; border: 1px solid var(--gray); border-radius: 5px; position: relative; width: 200%; height: 100%;" placeholder="Nhập năm cần thống kê" required>
           <button type="submit" class="btn btn-info ml-3 mr-3" data-toggle="modal">
-            <span class="mx-2" style="color: white">Tổng hợp</span>
+            <span class="mx-2" style="color: white">Thống kê</span>
           </button>
         </div>
       </div>

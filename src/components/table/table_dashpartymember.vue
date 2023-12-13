@@ -54,7 +54,7 @@
         </tbody>
       </table>
       <p v-if="partymember == ''" class="text-center mt-2" style="font-weight: bold;">
-      Chưa có phiếu nhận xét cho đảng viên.
+      Chưa có thông tin.
     </p>
     </div>
   </template>
@@ -71,7 +71,7 @@
       },
       fields: {
         type: Array,
-        default: ["Name", "Age", "Payment"],
+        default: [],
       },
       labels: {
         type: Array,

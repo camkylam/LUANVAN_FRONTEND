@@ -9,15 +9,16 @@ import CtyServices from "../../services/cty_province.service";
 import districtssServices from "../../services/district.service";
 import wardsServices from "../../services/ward.service";
 import hamletsServices from "../../services/hamlet.service";
-
+import accountService from "../../services/account.service";
 import Swal from "sweetalert2";
 import { alert_success, alert_error, alert_delete, alert_warning } from "../../assets/js/common.alert";
 import { http_getAll, http_create, http_getOne } from "../../assets/js/common.http";
+import mailService from "../../services/mail.service";
+import Recommentdation from "../../services/recommendation.service";
 
 export default {
   components: {
     Select,
-    // SelectOption,
     Select_Advanced,
   },
   props: {
@@ -41,22 +42,102 @@ export default {
       activeStep: 1,
       item: { name: "", birthday: "", phone: "", email: "", address: "", gender: "", dateJoin: "", dateOfficial: "" },
     });
-    // ****REFRESH
-    const edit = async () => {
-      data.item = props.item
-      //data.item.hamletId = selectedOptionHamlet.value;
-      data.item.positionId = selectedOptionPosition.value;
-      data.item.partycellId = selectedOptionPartyCell.value;
-      // console.log(data.item)
-      const result = await PartyMember.update(data.item._id, data.item)
-      // console.log(result)
-      if (!result.error) {
-        alert_success(`Sửa Đảng viên`, `${result.msg}`);
-        refresh();
-      } else {
-        alert_error(`Sửa Đảng viên`, `${result.msg}`);
+  
+
+const edit = async () => {
+ 
+  data.item = props.item;
+  const _idPartyMember = sessionStorage.getItem("partymemberId");
+  data.info = await http_getOne(PartyMember, _idPartyMember);
+  console.log(data.info);
+
+  const hamlet = await Recommentdation.get(data.info._id)
+  const hamletId = hamlet.document.PartyMember.Hamlet._id
+  const wardId = hamlet.document.PartyMember.Hamlet.Ward._id
+
+  const oldHamlet = hamlet.document.Detailed_Recommendation.Hamlet._id; 
+  const oldCty = hamlet.document.Detailed_Recommendation.Hamlet.Ward.District.Cty_Province._id;
+  const oldWard = hamlet.document.Detailed_Recommendation.Hamlet.Ward._id; 
+  const oldDistrict = hamlet.document.Detailed_Recommendation.Hamlet.Ward.District._id; 
+
+  const roleIdWard = "601b19c4-381f-4e44-98b7-e44f09f4f405"
+  
+  console.log(hamlet.document.PartyMember.Hamlet.Ward._id)
+  const roleEmailWard = await accountService.getEmailFromRoleAndWard({roleIdWard, wardId})
+      console.log(roleEmailWard)
+      const dataMailWard = reactive({
+        title: "Thông báo Đảng viên hiện không còn sinh hoạt tại chi bộ",
+        content: `<p><span style="text-transform: capitalize;">Trân</span> trọng kính chào ông/bà</p>
+                  <p><span style="text-transform: capitalize;">Xin</span> thông báo đến ông/bà hiện tại đảng viên <span style="text-transform: capitalize;"><b>${data.info.name}</b></span> 
+                    có mã số đảng viên là <span style="text-transform: capitalize;"><b>${data.info.code}</b></span> đã thay đổi địa chỉ cư trú
+                    nên sẽ không còn sinh hoạt tại chi bộ </p>
+                  <p><span style="text-transform: capitalize;">Chân</span> thành cảm ơn ông/bà</p>
+                  <p><span style="text-transform: capitalize;">Chúc</span> quý ông/bà nhiều sức khỏe</p>
+                  <p><span style="text-transform: capitalize;">Trân</span> trọng,</p>
+                  <p>Admin</p>`,
+        mail: roleEmailWard.join(', '), // Gán danh sách email vào đây
+      });
+
+  console.log( hamletId )
+  const roleIdHamlet = "28d7a8f7-c869-4258-88c7-d68c9bf4df9b";
+  const roleEmailHamlet = await accountService.getEmailByRoleHamlet({roleIdHamlet, hamletId});
+  const dataMailHamlet = reactive({
+        title: "Thông báo Đảng viên hiện không còn sinh hoạt tại chi bộ",
+        content: `<p><span style="text-transform: capitalize;">Trân</span> trọng kính chào ông/bà</p>
+                  <p><span style="text-transform: capitalize;">Xin</span> thông báo đến ông/bà hiện tại đảng viên <span style="text-transform: capitalize;"><b>${data.info.name}</b></span> 
+                    có mã số đảng viên là <span style="text-transform: capitalize;"><b>${data.info.code}</b></span> đã thay đổi địa chỉ cư trú
+                    nên sẽ không còn sinh hoạt tại chi bộ </p>
+                  <p><span style="text-transform: capitalize;">Chân</span> thành cảm ơn ông/bà</p>
+                  <p><span style="text-transform: capitalize;">Chúc</span> quý ông/bà nhiều sức khỏe</p>
+                  <p><span style="text-transform: capitalize;">Trân</span> trọng,</p>
+                  <p>Admin</p>`,
+        mail: roleEmailHamlet.join(', '), // Gán danh sách email vào đây
+      });
+
+
+  const roleId = "c11cb49c-fc67-4f79-84dc-d04ecb98bf8c";
+  const partycellId = data.info.PartyCell._id;
+  const roleEmails = await accountService.getEmailByRolePartyCell({roleId, partycellId});
+  console.log("alo", roleEmails);
+  
+
+  const dataMail = reactive({
+    title: "Tạo thư giới thiệu cho đảng viên",
+    content: `<p><span style="text-transform: capitalize;">Trân</span> trọng kính chào ông/bà</p>
+              <p><span style="text-transform: capitalize;">Kính</span> mời quý ông/bà tạo thư giới thiệu cho đảng viên <span style="text-transform: capitalize;"><b>${data.info.name}</b></span></p>
+              <p><span style="text-transform: capitalize;">Do</span> đảng viên vừa mới cập nhật lại nơi cư trú</p>
+              <p><span style="text-transform: capitalize;">Chân</span> thành cảm ơn ông/bà</p>
+              <p><span style="text-transform: capitalize;">Trân</span> trọng,</p>
+              <p>Admin</p>`,
+    mail: roleEmails.join(', '),
+  });
+ 
+  const result = await PartyMember.update(data.item._id, data.item);
+
+  if (!result.error) {
+    alert_success(`Sửa Đảng viên`, `${result.msg}`);
+    if (
+      data.item.Hamlet._id !== oldHamlet ||
+      data.item.Hamlet.Ward.District.Cty_Province._id !== oldCty ||
+      data.item.Hamlet.Ward._id !== oldWard ||
+      data.item.Hamlet.Ward.District._id !== oldDistrict
+    ) {
+      const dataMailPromise = mailService.sendmail(dataMail);
+      const dataMailMemberPromise = mailService.sendmail(dataMailHamlet);
+      const dataMailMemberPromiseWard = mailService.sendmail(dataMailWard);
+      try {
+        await Promise.all([dataMailPromise, dataMailMemberPromise, dataMailMemberPromiseWard]);
+        } catch (error) {
+        alert_error(`Lỗi khi gửi email: ${error.message}`);
       }
-    };
+    }
+
+    refresh();
+  } else {
+    alert_error(`Sửa Đảng viên`, `${result.msg}`);
+  }
+};
+
     const refresh = async (name) => {
       switch (name) {
         case "position": {
@@ -708,7 +789,7 @@ export default {
               <!-- page 2 -->
               <form v-if="data.activeStep == 2" action="" class="was-validated" style="width: 100%">
                 <!-- Position -->
-                <div class="form-group flex-grow-1 capitalize">
+                <!-- <div class="form-group flex-grow-1 capitalize">
                   <label for="">Chức vụ(<span style="color: red">*</span>):</label>
                   <div class="form-group w-100">
                     <Select_Advanced required :modelValue="item.Position.name" :options="positions.position"
@@ -720,16 +801,14 @@ export default {
                           }
                         ))
                       )
-                        " @delete="(value) => onDeletePosition(value)" @chose="(value, value1) => {
-    selectedOptionPosition = value;
-    item.Position.name = value1.name;
-  }
-    " />
+                        " @delete="(value) => onDeletePosition(value)" 
+                         @chose="(value, value1) => ((item.Position._id = value),(item.Position.name = value1.name))"
+                        />
                   </div>
-                </div>
+                </div> -->
 
                 <!-- Partycell -->
-                <div class="form-group flex-grow-1 capitalize">
+                <!-- <div class="form-group flex-grow-1 capitalize">
                   <label for="">Chi bộ(<span style="color: red">*</span>):</label>
                   <div class="form-group w-100">
                     <Select_Advanced required :modelValue="item.PartyCell.name" :options="partycells.partycell"
@@ -741,13 +820,11 @@ export default {
                           }
                         ))
                       )
-                        " @delete="(value) => onDeletePartyCell(value)" @chose="(value, value1) => (
-    (selectedOptionPartyCell = value),
-    (data.modelPar = value1.name)
-  )
-    " />
+                        " @delete="(value) => onDeletePartyCell(value)" 
+                        @chose="(value, value1) => ((item.PartyCell._id = value),(item.PartyCell.name = value1.name))"
+                        />
                   </div>
-                </div>
+                </div> -->
 
                 <!-- Cty -->
                 <div class="form-group flex-grow-1 capitalize">

@@ -1,5 +1,4 @@
 <script setup></script>
-
 <template>
   <div class=" color-dark border-footer py-2 px-2 ml-2 font-size-13" style="background-color: rgb(202, 202, 219); ">
         <span>ĐẠI HỌC CẦN THƠ</span><br>
@@ -16,9 +15,6 @@
 .border-footer {
   border: 1px solid var(--gray);
   
-}
-.italic-text {
-  font-style: italic;
 }
 .font-size-13 {
   font-size: 13px;

@@ -6,9 +6,9 @@ import Dropdown from "../../components/form/dropdown.vue";
 import Select from "../../components/form/select.vue";
 // import Assessment from "../introduction/assessment_form.vue";
 import Assessment from "../introduction/assessment_form.vue";
-import Add from "../comment/add.vue";
+import Add from "./add.vue";
 import CommentForm from "../introduction/assessment_form.vue";
-import Select_Advanced from "../../components/form/select_advanced.vue";
+
 import Opinion from "../../services/opinion.service";
 import OpinionId from "../introduction/opinion_form.vue"
 import { reactive, computed, watch, ref, onBeforeMount } from "vue";
@@ -31,7 +31,7 @@ export default {
     Pagination,
     Dropdown,
     Select,
-    Select_Advanced,
+  
     Add,
     CommentForm,
     OpinionId,
@@ -39,33 +39,52 @@ export default {
   },
     setup(ctx){
       const data = reactive({
-          
+        commentValue: partymemberModel,
+          click: true,
+          valuecomment:commentModel,
+          criterionValue: commentModel,
+          commentById: CommentByIdModel,
+          opinionId: '',
       })
+      console.log( data.click)
       const route = useRoute();
       const opinionId  = route.params.id;
-      //console.log(params)
+      data.opinionId = opinionId
+      const renewComment = async (value) => {
+        data.click = false
+        const idpartymember = await Opinion.getById(opinionId)
+        const params = idpartymember.document.Recommendation.PartyMember._id
+        data.commentValue = await PartyMember.get(params);
+        data.commentValue.birthday = formatDate(data.commentValue.birthday);
+        data.commentValue.dateJoin= formatDate(data.commentValue.dateJoin);
+        data.commentValue.dateOfficial= formatDate(data.commentValue.dateOfficial);
+        const criterionValue = await Criterion.getAll(data.commentValue.exemption)
+        data.criterionValue = criterionValue.document
+        const valuefalse = false
+        const criterion = await Criterion.getAll(valuefalse)
+      };
       const refresh = async () => {
+        const idpartymember = await Opinion.getById(opinionId)
+        const params = idpartymember.document.Recommendation.PartyMember._id
+        data.commentValue = await PartyMember.get(params);
+        data.commentValue.birthday = formatDate(data.commentValue.birthday);
+        data.commentValue.dateJoin= formatDate(data.commentValue.dateJoin);
+        data.commentValue.dateOfficial= formatDate(data.commentValue.dateOfficial);
         const comments = await Comment.getByOpinionId({opinionId})
-        // console.log(comments)
         if(!comments.error){
           data.comments = comments.document
-          // console.log(data.comments)
           data.comments.createdAt = formatDate(data.comments.createdAt)
-          // console.log(data.comments.createdAt)
         }
       }
       const handleGetById = async (id, item) => {
-
-    const rsPartyMember = await Comment.getById(id)
-    // console.log(rsPartyMember.document)
-    if(!rsPartyMember.error){
-      data.commentById = rsPartyMember.document
-      data.commentById.createdAt = formatDate(data.commentById.createdAt)
-    }
-     else {
-      data.commentById = null;
-  }
-  // console.log(data.commentById)
+        const rsPartyMember = await Comment.getById(id)
+        if(!rsPartyMember.error){
+        data.commentById = rsPartyMember.document
+        data.commentById.createdAt = formatDate(data.commentById.createdAt)
+      }
+      else {
+        data.commentById = null;
+      }
 };
 
     
@@ -76,7 +95,9 @@ export default {
     return {
       data,
       refresh,
-      handleGetById
+      renewComment,
+      handleGetById,
+      comfirmComment
     }
   }
 }
@@ -93,7 +114,11 @@ export default {
     <div class="border-hr mb-2"></div>
 
     <div class="d-flex menu my-2 mx-2 justify-content-end">
-    
+      <button v-if="comfirmComment()" type="button" class="btn btn-warning ml-3 mr-3" data-toggle="modal" data-target="#model-comment"
+          @click="renewComment">
+          <span class="mx-2" style="color: white">Thêm phiếu nhận xét</span>
+        </button>
+        <Add v-if= "!data.click" @renewComment="(value) => {renewComment(value);}" :item="data.commentValue" :criterion = "data.criterionValue" :opinionId="data.opinionId"/>
       <router-link
         :to="{ name: 'Introduction' }"
         @click="activeMenu = 1"

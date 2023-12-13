@@ -17,7 +17,6 @@
             <td class="size-16">{{ startRow + index }}</td>
             <td class="size-16">{{ item?.PartyMember?.name }}</td>
             <td class="size-16">{{ item?.PartyMember?.code}}</td>
-            <!-- <td class="size-16">{{ item?.PartyMember?.email}}</td> -->
             <td class="size-16">{{ item?.PartyMember?.gender}}</td>
             <td class="size-16">{{ (item?.PartyMember?.exemption === 'true') ? 'Được miễn' : 'Không được miễn'}}</td>
             <td class="size-16">{{ item.PartyMember?.Hamlet?.name}}</td>
@@ -27,7 +26,7 @@
             <td class="">
             <div class="d-flex align-items-center" v-if="activeAction == true">
               <button type="button" class="format-btn" data-toggle="modal" data-target="#model-view"
-              @click="$emit('view', item._id , item)"
+              @click="$emit('view', item.PartyMember?._id , item)"
               >
                 <span id="introduction" class="material-symbols-outlined d-flex align-content-center"
               >
@@ -38,7 +37,7 @@
               <button type="button" class="format-btn" data-toggle="modal" 
               >
                 <span  id="introduction" class="material-symbols-outlined d-flex align-content-center" title="thư giới thiệu"
-                @click="$emit('renewIntro', item._id, item)">
+                @click="$emit('renewIntro', item.PartyMember?._id, item)">
                   send
                 </span> 
               </button>&nbsp;
@@ -48,7 +47,7 @@
         </tbody>
       </table>
       <p v-if="acceptRecommendation.length == 0" class="text-center mt-2" style="font-weight: bold;">
-      Chưa có đảng viên nào chưa có thư giới thiệu
+      Chưa có thông tin
     </p>
     </div>
   </template>
@@ -62,7 +61,7 @@
       },
       fields: {
         type: Array,
-        default: ["Name", "Age", "Payment"],
+        default: [],
       },
       labels: {
         type: Array,

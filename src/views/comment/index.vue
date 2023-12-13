@@ -7,7 +7,7 @@ import Select from "../../components/form/select.vue";
 // import Assessment from "../introduction/assessment_form.vue";
 import Add from "../comment/add.vue";
 import CommentForm from "../introduction/assessment_form.vue";
-import Select_Advanced from "../../components/form/select_advanced.vue";
+
 
 import { reactive, computed, watch, ref, onBeforeMount } from "vue";
 import Criterion from "../../services/criterion";
@@ -29,7 +29,6 @@ export default {
     Pagination,
     Dropdown,
     Select,
-    Select_Advanced,
     Add,
     CommentForm
   },
@@ -39,7 +38,7 @@ export default {
           click: true,
           valuecomment:commentModel,
           criterionValue: commentModel,
-          //noteValue: commentModel,
+         
           commentById: CommentByIdModel,
       })
       const route = useRoute();
@@ -47,20 +46,13 @@ export default {
       const renewComment = async (value) => {
         data.click = false
         data.commentValue = await PartyMember.get(params);
-        // console.log(data.commentValue)
         data.commentValue.birthday = formatDate(data.commentValue.birthday);
         data.commentValue.dateJoin= formatDate(data.commentValue.dateJoin);
         data.commentValue.dateOfficial= formatDate(data.commentValue.dateOfficial);
-
-       // const noteValue = await Criterion
-
         const criterionValue = await Criterion.getAll(data.commentValue.exemption)
         data.criterionValue = criterionValue.document
-        // console.log(criterionValue)
-
         const valuefalse = false
         const criterion = await Criterion.getAll(valuefalse)
-        // console.log("aloooo",criterion)
       };
 
     const handleDelete = async (id, item) => {
@@ -83,9 +75,8 @@ export default {
     const handleGetById = async (id, item) => {
 
         data.commentValue = await PartyMember.get(params);
-        // console.log(data.commentValue)
         const rsPartyMember = await Comment.getById(id)
-        // console.log(rsPartyMember.document)
+
         if(!rsPartyMember.error){
           data.commentById = rsPartyMember.document
           data.commentById.createdAt = formatDate(data.commentById.createdAt)
@@ -93,15 +84,14 @@ export default {
          else {
           data.commentById = null;
       }
-      // console.log(data.commentById)
     };
 
       const refresh = async () => {
         const comments = await Comment.getByPartymember(params)
-        // console.log(comments)
+        
         if(!comments.error){
           data.comments = comments.document
-          // console.log(data.comments)
+         
           for(const commentsItem of data.comments )
           commentsItem.createdAt = formatDate(commentsItem.createdAt)
         }
@@ -114,15 +104,8 @@ export default {
           item.level = item.Criterion_Evaluations[0].name;
           item.level2 = item.Criterion_Evaluations[1].name;
           item.level3 = item.Criterion_Evaluations[2].name;
-          // console.log("Danh sách giá trị với mức:", item.level);
-          // console.log("Danh sách giá trị với mức 2:", item.level2);
-          // console.log("Danh sách giá trị với mức 3:", item.level3);
         }
-        
       }
-
-        // console.log("Danh sách giá trị với mức:", firstFiveValues);
-        // console.log("Các giá trị đầu tiên:", firstFiveValues);
       }
       onBeforeMount(async () => {
         await refresh();

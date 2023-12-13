@@ -1,5 +1,5 @@
 const role = sessionStorage.getItem("roleName");
-let permissionList = localStorage.getItem("permissionList");
+let permissionList = sessionStorage.getItem("permissionList");
 console.log("permissionList", permissionList);
 permissionList = JSON.parse(permissionList);
 // console.log("permissionList", permissionList);
@@ -19,47 +19,8 @@ const isCreatePartyMember = () => {
   return user == "admin" || permissionList?.includes("thêm thông tin đảng viên");
 };
 
-// Thống kê
-const isReadDashboard = () => {
-  return user == "admin" || permissionList?.includes("xem thống kê");
-};
-
-// Mail
 const isMail = () => {
   return user == "admin" || permissionList?.includes("gửi mail");
-};
-
-// Tài khoản
-const isReadAccount = () => {
-  return user == "admin" || permissionList?.includes("xem tài khoản");
-};
-
-// Vai trò
-const isReadRole = () => {
-  return user == "admin" || permissionList?.includes("xem vai trò");
-};
-const isCreateRole = () => {
-  return user == "admin" || permissionList?.includes("thêm vai trò");
-};
-const isDeleteRole = () => {
-  return user == "admin" || permissionList?.includes("xóa vai trò");
-};
-const isSetRole = () => {
-  return user == "admin" || permissionList?.includes("áp dụng vai trò");
-};
-
-// quyền
-const isCreatePermission = () => {
-  return user == "admin" || permissionList?.includes("thêm quyền");
-};
-const isDeletePermission = () => {
-  return user == "admin" || permissionList?.includes("xóa quyền");
-};
-const isReadPermission = () => {
-  return user == "admin" || permissionList?.includes("xem quyền");
-};
-const isSetPermission = () => {
-  return user == "admin" || permissionList?.includes("áp dụng quyền");
 };
 
 //thư giới thiệu
@@ -77,8 +38,12 @@ const isAcceptRecommendation = () => {
 }
 //Phiếu xin ý kiến
 const isComfirmOpinion = () => {
+  return user == "admin" || permissionList?.includes("thêm phiếu xin ý kiến")
+}
+const signedOpinion = () => {
   return user == "admin" || permissionList?.includes("xác nhận phiếu xin ý kiến")
 }
+
 //Phiếu nhận xét
 const comfirmComment = () => {
   return user == "admin" || permissionList?.includes("thêm phiếu nhận xét")
@@ -90,33 +55,21 @@ const signedComment = () => {
 
 export {
   role,
-  permissionList,
   isDeletePartyMember,
   isEditPartyMember,
   isReadPartyMember,
   isCreatePartyMember,
-  // Thống kê
-  isReadDashboard,
+  
   // mail
   isMail,
-  // Tài khoản
-  isReadAccount,
-  // vai trò
-  isReadRole,
-  isCreateRole,
-  isDeleteRole,
-  isSetRole,
-  // quyền
-  isCreatePermission,
-  isDeletePermission,
-  isReadPermission,
-  isSetPermission,
+  
   //thư giới thiệu
   isCreateRecommendation,
   isComfirmRecommendation,
   isAcceptRecommendation,
   //Phiếu xin ý kiến
   isComfirmOpinion,
+  signedOpinion,
   comfirmComment,
   signedComment
 };

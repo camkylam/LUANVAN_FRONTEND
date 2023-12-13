@@ -72,7 +72,7 @@
       },
       fields: {
         type: Array,
-        default: ["Name", "Age", "Payment"],
+        default: [],
       },
       labels: {
         type: Array,
@@ -100,10 +100,6 @@
   </script>
   
   <style scoped>
-  .your-yellow-button-class {
-  background-color: yellow;
-  color: black;
-}
 
 .yellow-button {
   background-color: yellow;
@@ -117,11 +113,6 @@
   border: 1px solid black;
 }
   
-  /* .my-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-transform: capitalize;
-  } */
   .my-table {
     width: 100%;
     border-collapse: collapse;
@@ -169,24 +160,6 @@
   .border-table-all {
     border: 1px solid var(--gray);
   }
-  
-  /* .my-table th,
-  .my-table td {
-    border: 1px solid var(--gray);
-    border-left: 0;
-    border-right: 0;
-    padding: 8px;
-  }
-  
-  .my-table th {
-    font-weight: 900;
-    font-size: 14px;
-  }
-  
-  .my-table tbody tr:nth-child(even) {
-    font-size: 13px;
-  }
-   */
   #view,
   #edit,
   #delete,

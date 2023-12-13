@@ -29,8 +29,15 @@
             <td class="">
               
             <div class="d-flex align-items-center" v-if="activeAction == true">
+              <button type="button" class="format-btn" data-toggle="modal" data-target="#model-view"
+              @click="$emit('view', item?.Opinion?.Recommendation?.PartyMember?._id , item)"
+              >
+                <span id="introduction" class="material-symbols-outlined d-flex align-content-center"
+              >
+                visibility
+                </span>
+              </button>&nbsp;
               <button type="button" class="format-btn" data-toggle="modal" data-target="#model-assessment">
-
                 <span
                   id="opinion"
                   class="material-symbols-outlined d-flex align-content-center"

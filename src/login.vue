@@ -102,7 +102,7 @@ export default {
 
             let permissionList = response.data.document.Role.Permissions;
             permissionList = permissionList.map((value) => value.name);
-            localStorage.setItem(
+            sessionStorage.setItem(
               "permissionList",
               JSON.stringify(permissionList)
             );

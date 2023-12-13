@@ -32,7 +32,7 @@
       },
       fields: {
         type: Array,
-        default: ["Name", "Age", "Payment"],
+        default: [],
       },
     },
     data() {
@@ -95,11 +95,6 @@
   border: 1px solid black;
   }
   
-  /* .my-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-transform: capitalize;
-  } */
   .my-table th,
   .my-table td {
   border: 1px solid black;

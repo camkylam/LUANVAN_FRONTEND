@@ -23,10 +23,7 @@
             <td class="">
             <div class="d-flex align-items-center" v-if="activeAction == true">
               <button type="button" class="format-btn" data-toggle="modal" data-target="#model-introduction"
-              :class="{ 'your-green-button-class':recommendation.recommendationStatus === 'created',
-              'your-yellow-button-class': recommendation.recommendationStatus === 'confirmed',
-              'your-info-button-class': recommendation.recommendationStatus === 'accepted'
-             }"
+              
               >
                 <span id="introduction" class="material-symbols-outlined d-flex align-content-center"
                 @click="$emit('getbyId', item._id, item)">
@@ -46,7 +43,7 @@
           </tr>
         </tbody>
       </table>
-      <p v-if="recommen.length == 0" class="text-center mt-2" style="font-weight: bold;">
+      <p v-if="recommen?.length == 0" class="text-center mt-2" style="font-weight: bold;">
       Chưa có thư giới thiệu cho đảng viên.
     </p>
     </div>
@@ -63,7 +60,7 @@
       
       fields: {
         type: Array,
-        default: ["Name", "Age", "Payment"],
+        default: [],
       },
       labels: {
         type: Array,
@@ -91,7 +88,7 @@
   </script>
   
   <style scoped>
-  .your-green-button-class {
+  /* .your-green-button-class {
   background-color: rgb(46, 231, 46);
   color: white;
 }
@@ -102,7 +99,7 @@
 .your-info-button-class{
   background-color: rgb(88, 88, 241);
   color: white;
-}
+} */
 
 /* .my-table {
   width: 90%;
@@ -130,6 +127,10 @@
   font-size: 14px;
   
 }
+:class="{ 'your-green-button-class':recommendation.recommendationStatus === 'created',
+              'your-yellow-button-class': recommendation.recommendationStatus === 'confirmed',
+              'your-info-button-class': recommendation.recommendationStatus === 'accepted'
+             }"
 
 .my-table tbody tr:nth-child(even) {
   font-size: 13px;

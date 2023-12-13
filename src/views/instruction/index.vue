@@ -1,7 +1,4 @@
 <script>
-import { ref, reactive, computed, watch, onMounted } from "vue";
-import { isReadDashboard } from "../../use/getSessionItem";
-
 export default {
   components: {
   },

@@ -1,7 +1,6 @@
 <script>
 import Add from "./add.vue";
 import Edit from "./edit.vue";
-import FormWizard from "../../components/form/form-wizard.vue";
 import SetPermission from "./setPermission.vue";
 import Pagination from "../../components/table/pagination.vue";
 import Dropdown from "../../components/form/dropdown.vue";
@@ -16,9 +15,7 @@ import { useRouter } from "vue-router";
 import Role from "../../services/role.service";
 
 import { http_getAll, http_create, http_getOne, http_deleteOne, http_update } from "../../assets/js/common.http";
-import { alert_success, alert_error, alert_delete, alert_warning, alert_info, alert_delete_wide, alert_input_text, alert_mail } from "../../assets/js/common.alert";
-import { formatDateTime, formatDate, formatDateTime_2 } from "../../assets/js/common.js";
-import { isReadRole, isCreateRole, isDeleteRole, isSetRole } from '../../use/getSessionItem'
+import { alert_success, alert_error, alert_delete, alert_warning,  alert_delete_wide} from "../../assets/js/common.alert";
 
 export default {
   components: {
@@ -31,7 +28,7 @@ export default {
     DeleteAll,
     Edit,
     Select_Advanced,
-    FormWizard,
+  
     SetPermission,
   },
   setup(ctx) {
@@ -319,9 +316,7 @@ export default {
       handleSelectAll,
       deleteMany,
       removeItem,
-      isCreateRole,
-      isDeleteRole,
-      isSetRole
+     
     };
   },
 };
@@ -350,25 +345,7 @@ export default {
     <div class="border-hr mb-3"></div>
     <div class="d-flex justify-content-between mx-3 mb-3">
       <div class="d-flex justify-content-start">
-        <!-- <Select class="d-flex justify-content-start" :options="[
-          {
-            name: 5,
-            value: 5,
-          },
-          {
-            name: 10,
-            value: 10,
-          },
-          {
-            name: 20,
-            value: 20,
-          },
-          {
-            name: 30,
-            value: 30,
-          },
-        ]" style="width: 125px" :title="`Số bản ghi`" @update:entryValue="(value) => (data.entryValue = value)"
-          :entryValue="data.entryValue" @refresh="(data.entryValue = 'All'), (data.currentPage = 1)" /> -->
+        
         <Search class="ml-3" style="width: 300px" @update:searchText="(value) => (data.searchText = value)"
           :entryValue="data.searchText" @choseSearch="async (value) => (
 
@@ -384,17 +361,17 @@ export default {
       </div>
       <div class="d-flex align-items-start">
         <button type="button" class="btn btn-danger mr-3" data-toggle="modal" data-target="#model-delete-all"
-          @click="deleteMany()" :disabled="isDeleteRole() ? false : true">
+          @click="deleteMany()" >
           <span id="delete-all" class="mx-2">Xoá</span>
         </button>
         <!-- <DeleteAll :items="data.items" /> -->
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#model-add"
-          :disabled="isCreateRole() ? false : true">
+          >
           <span id="add" class="mx-2">Thêm</span>
         </button>
         <Add :items="data.itemAdd" @create="create" @remove="removeItem" />
         <button type="button" class="btn btn-secondary ml-3" data-toggle="modal" data-target="#model-setPermission"
-          @click="setPermission()" :disabled="isSetRole() ? false : true">
+          @click="setPermission()" >
           <span style="font-size: 14px" id="setPermission" class="mx-2">Tạo quyền</span>
         </button>
         <SetPermission @refresh="refresh()" v-if="data.showSetPermission" :item="data.roleValue" />
@@ -402,7 +379,7 @@ export default {
     </div>
     <!-- Table -->
     <Table :items="setPages" :fields="['Tên vai trò', 'Quyền']" :labels="['name', 'pTList']"
-      :showActionList="[false, false, isDeleteRole() ? true : false]" :startRow="data.startRow"
+       :startRow="data.startRow"
       :selectAll="data.selectAll" @selectAll="(value) => handleSelectAll(value)" @delete="(value) => deleteOne(value)"
       @edit="async (value, value1) => (
         (data.editValue = await getOne(value._id)), (data.activeEdit = value1)

@@ -8,7 +8,7 @@ export default {
     },
     fields: {
       type: Array,
-      default: ["Name", "Age", "Payment"],
+      default: [],
     },
     labels: {
       type: Array,
@@ -73,7 +73,6 @@ export default {
           <th v-for="(value, index) in fields" :key="index">
             <span class="size-16">{{ value }}</span>
           </th>
-          <!-- <th><span class="size-16">Hành động</span></th> -->
         </tr>
       </thead>
       <tbody>
@@ -109,58 +108,11 @@ export default {
               </p>
             </div>
           </td>
-
-
-          <!--TỰ CÓ -->
-          <!-- <td v-if="activeAction == true">
-            <div class="d-flex align-items-center">
-              <button
-                v-if="showActionList[0] == true"
-                type="button"
-                class=""
-                data-toggle="modal"
-                data-target="#model-view"
-              >
-                <span
-                  id="view"
-                  class="material-symbols-outlined d-flex align-items-center"
-                >
-                  visibility
-                </span>
-              </button>
-              <button
-                v-if="showActionList[1] == true"
-                type="button"
-                class="mx-2"
-                data-toggle="modal"
-                data-target="#model-edit"
-              >
-                <span
-                  id="edit"
-                  class="material-symbols-outlined d-flex align-items-center justify-content-center"
-                  @click="$emit('edit', item, true)"
-                >
-                  edit
-                </span>
-              </button>
-              <span
-                v-if="showActionList[2] == true"
-                id="delete"
-                class="material-symbols-outlined"
-                @click="$emit('delete', item._id, item)"
-              >
-                delete
-              </span>
-            </div>
-          </td> -->
-
-
-          
         </tr>
       </tbody>
     </table>
     <p v-if="items.length == 0" class="text-center mt-2">
-      Không tồn tại bản ghi.
+      Không có thông tin.
     </p>
   </div>
 </template>
@@ -172,9 +124,7 @@ export default {
   text-transform: capitalize;
 }
 
-.border-table-all {
-  border: 1px solid var(--gray);
-}
+
 
 .my-table th,
 .my-table td {

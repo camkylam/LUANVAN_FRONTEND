@@ -73,7 +73,7 @@ export default {
     },
     fields: {
       type: Array,
-      default: ["Name", "Age", "Payment"],
+      default: [],
     },
     labels: {
       type: Array,
@@ -101,17 +101,29 @@ export default {
     }
   },
  methods: {
+  capitalizeWords(sentence) {
+      return sentence
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+    },
+
   exportToExcel() {
     const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Dữ Liệu');
 
       const columns = [
-        { header: 'STT', key: 'index' },
-        { header: 'Ngày xin ý kiến', key: 'name' },
-        { header: 'Khu vực, ấp', key: 'area' },
-        { header: 'Xã, phường', key: 'ward' },
-        { header: 'Quận, huyện', key: 'district' },
-        { header: 'Tỉnh, thành phố', key: 'city' },
+        { header: 'STT', key: 'index', width: 5, style: { textTransform: 'capitalize' }  },
+        { header: 'Họ và tên', key: 'name', width: 25, style: { textTransform: 'capitalize' } },
+        { header: 'Mã số đảng viên', key: 'code', width: 15, style: { textTransform: 'capitalize' }  },
+        { header: 'Email đảng viên', key: 'email', width: 30, style: { textTransform: 'capitalize' }  },
+        { header: 'Giới tính', key: 'gender', width: 15, style: { textTransform: 'capitalize' } },
+        { header: 'Ngày vào đảng', key: 'dateJoin',width: 20,style: { textTransform: 'capitalize' }  },
+        { header: 'Ngày vào đảng chính thức', key: 'dateOfficial', width: 20, style: { textTransform: 'capitalize' }  },
+        { header: 'Khu vực, ấp', key: 'area', width: 20, style: { textTransform: 'capitalize' }   },
+        { header: 'Xã, phường', key: 'ward',width: 20, style: { textTransform: 'capitalize' }   },
+        { header: 'Quận, huyện', key: 'district', width: 20,style: { textTransform: 'capitalize' }   },
+        { header: 'Tỉnh, thành phố', key: 'city', width: 20 , style: { textTransform: 'capitalize' }  },
       ];
 
       worksheet.columns = columns;
@@ -119,11 +131,18 @@ export default {
       this.items.forEach((item, index) => {
         const row = {
           index: this.startRow + index,
-          name: item.name,
-          area: item.Hamlet.name || '',
-          ward: item.Hamlet.Ward.name || '',
-          district: item.Hamlet.Ward.District.name || '',
-          city: item.Hamlet.Ward.District.Cty_Province.name || '',
+          name: item.name ? this.capitalizeWords(item.name) : '',
+          code: item.code,
+          email: item.email,
+          gender: item.gender ? this.capitalizeWords(item.gender) : '',
+          dateJoin: item.dateJoin,
+          dateOfficial: item.dateOfficial,
+          area: item.Hamlet.name ? this.capitalizeWords(item.Hamlet.name) : '',
+          ward: item.Hamlet.Ward.name ? this.capitalizeWords(item.Hamlet.Ward.name) : '',
+          district: item.Hamlet.Ward.District.name ? this.capitalizeWords(item.Hamlet.Ward.District.name) : '',
+          city: item.Hamlet.Ward.District.Cty_Province.name
+            ? this.capitalizeWords(item.Hamlet.Ward.District.Cty_Province.name)
+            : '',
         };
         worksheet.addRow(row);
       });

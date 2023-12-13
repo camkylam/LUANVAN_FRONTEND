@@ -14,9 +14,7 @@
         </thead>
         <tbody>
           <tr>
-            <td class="size-16">5</td>
-
-            <!----<td class="size-16">{{ countNeuguongtot }}</td>-->
+            <td class="size-16">{{ countNeuguongtot }}</td>
             <td class="size-16">{{ countNeuguong }}</td>
             <td class="size-16">{{ countChuaneuguong }}</td>
           </tr>
@@ -34,7 +32,7 @@
       },
       fields: {
         type: Array,
-        default: ["Name", "Age", "Payment"],
+        default: [],
       },
     },
     data() {
@@ -71,37 +69,13 @@
   </script>
   
   <style scoped>
-  .header-row {
-    background-color: #f2f2f2; /* Điều chỉnh giá trị màu xám nhạt hơn tại đây */
-  }
 
   .my-table {
   width: 100%;
   border-collapse: collapse;
   text-transform: capitalize;
   }
-  .your-yellow-button-class {
-  background-color: yellow;
-  color: black;
-  }
   
-  .yellow-button {
-  background-color: yellow;
-  color: black;
-  border: 1px solid black;
-  }
-  
-  .blue-button {
-  background-color: rgb(114, 114, 255);
-  color: white;
-  border: 1px solid black;
-  }
-  
-  /* .my-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-transform: capitalize;
-  } */
   .my-table th,
   .my-table td {
   border: 1px solid black;
@@ -140,29 +114,6 @@
   /* Màu và độ rộng của đường kẻ */
   padding: 8px;
   }
-  
-  
-  .border-table-all {
-  border: 1px solid var(--gray);
-  }
-  
-  /* .my-table th,
-  .my-table td {
-  border: 1px solid var(--gray);
-  border-left: 0;
-  border-right: 0;
-  padding: 8px;
-  }
-  
-  .my-table th {
-  font-weight: 900;
-  font-size: 14px;
-  }
-  
-  .my-table tbody tr:nth-child(even) {
-  font-size: 13px;
-  }
-  */
   #view,
   #edit,
   #delete,

@@ -905,164 +905,63 @@ export default {
     };
 
   },
-//   methods: {
-//   async createImportExcel() {
-//     console.log("aloooo");
-//     const fileInput = document.getElementById('fileInput');
-//     await this.handleFileChange({ target: { files: [fileInput.files[0]] } });
-//   },
+methods: {
+  // async createImportExcel() {
+  //   // console.log("aloooo");
+  //   const fileInput = document.getElementById('fileInput');
+  //   await this.handleFileChange({ target: { files: [fileInput.files[0]] } });
+  // },
+  async createImportExcel() {
+    const fileInput = document.getElementById('fileInput');
+    const files = fileInput.files;
+
+    for (const file of files) {
+        await this.readAndProcessFile(file);
+    }
+},
+
 
 //   async handleFileChange(event) {
-//     console.log('Change event fired!');
-//     const file = event.target.files[0];
-//     if (file) {
-//       const reader = new FileReader();
-//       reader.onload = async (e) => {
-//         const data = e.target.result;
-//         const workbook = new ExcelJS.Workbook();
-//         await workbook.xlsx.load(data);
-//         const worksheet = workbook.getWorksheet(1);
-//         const excelData = worksheet.getSheetValues();
-//         await this.handleImportedData(excelData);
-//       };
-//       reader.readAsArrayBuffer(file);
-//     }
-//   },
-// //   async handleImportedData(excelData) {
-// //   const dataToProcess = excelData.slice(1); // Bỏ qua dòng tiêu đề
-// //   await Promise.all(dataToProcess.map(async (row) => {
-// //     const importedDataItem = {
-// //       code: row[1],
-// //       name: row[2],
-// //       birthday: row[3],
-// //       address: row[4],
-// //       phone: row[5],
-// //       email: row[6],
-// //       gender: row[7],
-// //       dateJoin: row[8],
-// //       dateOfficial: row[9],
-// //       exemption: row[10],
-// //       positionName: row[11],
-// //       partycellName: row[12],
-// //       ctyName: row[13],
-// //       districtName: row[14],
-// //       wardName: row[15],
-// //       hamletName: row[16],
-// //       roleName: row[17],
-// //     };
-// //     console.log(importedDataItem.name);
-// //     importedDataItem.username = importedDataItem.code;
-
-// //     importedDataItem.password = this.setAccount();
-
-// //     await this.createWithData(importedDataItem);
-// //   }));
-// // },
-
-// async handleImportedData(excelData) {
-//   const dataToProcess = excelData.slice(1); // Bỏ qua dòng tiêu đề
-
-//   await Promise.all(dataToProcess.map(async (row) => {
-//     const importedDataItem = {
-//       code: row[1],
-//       name: row[2],
-//       birthday: row[3],
-//       address: row[4],
-//       phone: row[5],
-//       email: row[6],
-//       gender: row[7],
-//       dateJoin: row[8],
-//       dateOfficial: row[9],
-//       exemption: row[10],
-//       positionName: row[11],
-//       partycellName: row[12],
-//       ctyName: row[13],
-//       districtName: row[14],
-//       wardName: row[15],
-//       hamletName: row[16],
-//       roleName: row[17],
+//   // console.log('Change event fired!');
+//   const file = event.target.files[0];
+//   if (file) {
+//     const reader = new FileReader();
+//     reader.onload = async (e) => {
+//       const data = e.target.result;
+//       const arrayBuffer = ArrayBuffer.isView(data) ? data.buffer : data;
+//       const workbook = new ExcelJS.Workbook();
+//       await workbook.xlsx.load(arrayBuffer);
+//       const worksheet = workbook.getWorksheet(1);
+//       const excelData = this.getSheetValues(worksheet);
+//       await this.handleImportedData(excelData);
 //     };
-
-//     console.log(importedDataItem.name);
-
-//     importedDataItem.username = importedDataItem.code;
-//     importedDataItem.password = this.setAccount();
-
-//     await this.createWithData(importedDataItem);
-//   }));
+//     reader.readAsArrayBuffer(file);
+//   }
 // },
+async handleFileChange(event) {
+    const files = event.target.files;
 
-//   async createWithData(importedDataItem) {
-//     const PositionName = importedDataItem.positionName;
-//     console.log(PositionName)
-//     const PartycellName = importedDataItem.partycellName;
-//     const HamletName = importedDataItem.hamletName;
-//     const CtyProvinceName = importedDataItem.ctyName;
-//     const WardName = importedDataItem.wardName;
-//     const DistrictName = importedDataItem.districtName;
-//     console.log(DistrictName)
-//     const RoleName = importedDataItem.roleName;
+    for (const file of files) {
+        await this.readAndProcessFile(file);
+    }
+},
 
-//     importedDataItem.positionId = await Position.findIdByName({ PositionName });
-//     console.log(importedDataItem.positionId)
-//     importedDataItem.partycellId = await PartyCell.findIdByName({ PartycellName });
-//     importedDataItem.hamletId = await hamletsServices.findIdByName({ HamletName, DistrictName, WardName, CtyProvinceName});
-//     importedDataItem.roleId = await Role.findIdByName({ RoleName });
-
-    
-//     const account = await http_create(Account, importedDataItem);
-//     console.log(account)
-
-//     if (account.user_name) {
-//       const result = await http_create(PartyMember, importedDataItem);
-//       console.log(result)
-
-//       if (!result.error) {
-//         alert_success(
-//           `Thêm đảng viên`,
-//           `Đảng viên "${result.document.name}" đã được tạo thành công.`
-//         );
-//       } else {
-//         alert_error(`Thêm đảng viên`, `${result.msg}`);
-//       }
-//     } else {
-//       alert_error(`Thêm đảng viên`, `${account.msg}`);
-//     }
-//   },
-
-//   setAccount() {
-//     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-//     let password = "";
-//     for (let i = 0; i < 9; i++) {
-//       const randomIndex = Math.floor(Math.random() * charset.length);
-//       password += charset[randomIndex];
-//     }
-//     return password;
-//   },
-// }
-methods: {
-  async createImportExcel() {
-    // console.log("aloooo");
-    const fileInput = document.getElementById('fileInput');
-    await this.handleFileChange({ target: { files: [fileInput.files[0]] } });
-  },
-
-  async handleFileChange(event) {
-  // console.log('Change event fired!');
-  const file = event.target.files[0];
-  if (file) {
+async readAndProcessFile(file) {
     const reader = new FileReader();
+    
     reader.onload = async (e) => {
-      const data = e.target.result;
-      const arrayBuffer = ArrayBuffer.isView(data) ? data.buffer : data;
-      const workbook = new ExcelJS.Workbook();
-      await workbook.xlsx.load(arrayBuffer);
-      const worksheet = workbook.getWorksheet(1);
-      const excelData = this.getSheetValues(worksheet);
-      await this.handleImportedData(excelData);
+        const data = e.target.result;
+        const arrayBuffer = ArrayBuffer.isView(data) ? data.buffer : data;
+        const workbook = new ExcelJS.Workbook();
+        
+        await workbook.xlsx.load(arrayBuffer);
+        const worksheet = workbook.getWorksheet(1);
+        const excelData = this.getSheetValues(worksheet);
+        
+        await this.handleImportedData(excelData);
     };
+
     reader.readAsArrayBuffer(file);
-  }
 },
   arrayBufferToString(arrayBuffer) {
     const uint8Array = new Uint8Array(arrayBuffer);
@@ -1118,7 +1017,7 @@ methods: {
       // console.log(importedDataItem.gender)
 
       //console.log(importedDataItem.name);
-
+      console.log('Imported Data:', excelData);
       importedDataItem.username = importedDataItem.code;
       // console.log(importedDataItem.username)
       importedDataItem.password = this.setAccount();
@@ -1186,6 +1085,141 @@ methods: {
     return password;
   },
 }
+// methods: {
+//   async createImportExcel() {
+//     const fileInput = document.getElementById('fileInput');
+//     const files = fileInput.files;
+
+//     for (const file of files) {
+//       await this.readAndProcessFile(file);
+//     }
+//   },
+
+//   async readAndProcessFile(file) {
+//     const reader = new FileReader();
+
+//     reader.onload = async (e) => {
+//       const data = e.target.result;
+//       const arrayBuffer = ArrayBuffer.isView(data) ? data.buffer : data;
+//       const workbook = new ExcelJS.Workbook();
+
+//       await workbook.xlsx.load(arrayBuffer);
+//       const worksheet = workbook.getWorksheet(1);
+//       const excelData = this.getSheetValues(worksheet);
+
+//       console.log('Read and Processed Data:', excelData);
+//       await this.handleImportedData(excelData);
+//     };
+
+//     reader.readAsArrayBuffer(file);
+//   },
+
+//   arrayBufferToString(arrayBuffer) {
+//     const uint8Array = new Uint8Array(arrayBuffer);
+//     const stringArray = uint8Array.reduce((data, byte) => data + String.fromCharCode(byte), '');
+//     return stringArray;
+//   },
+
+//   getSheetValues(worksheet) {
+//     const values = [];
+//     worksheet.eachRow((row) => {
+//       values.push(row.values);
+//     });
+
+//     console.log('Sheet Values:', values);
+//     return values;
+//   },
+
+//   async handleImportedData(excelData) {
+//     if (!excelData || !excelData.length) {
+//       console.error('Không có dữ liệu hợp lệ từ file Excel.');
+//       return;
+//     }
+
+//     const dataToProcess = excelData.slice(1); // Bỏ qua dòng tiêu đề
+
+//     console.log('Data To Process:', dataToProcess);
+
+//     await Promise.all(dataToProcess.map(async (row) => {
+//       const importedDataItem = {
+//         code: row[1],
+//         name: row[2],
+//         birthday: row[3],
+//         address: row[4],
+//         phone: row[5],
+//         email: row[6],
+//         gender: row[7],
+//         dateJoin: row[8],
+//         dateOfficial: row[9],
+//         exemption: row[10],
+//         positionName: row[11],
+//         partycellName: row[12],
+//         ctyName: row[13],
+//         districtName: row[14],
+//         wardName: row[15],
+//         hamletName: row[16],
+//         roleName: row[17],
+//       };
+
+//       console.log('Imported Data Item:', importedDataItem);
+
+//       importedDataItem.username = importedDataItem.code;
+//       importedDataItem.password = this.setAccount();
+
+//       await this.createWithData(importedDataItem);
+//     }));
+//   },
+
+//   async createWithData(importedDataItem) {
+//     const PositionName = importedDataItem.positionName;
+//     const PartycellName = importedDataItem.partycellName;
+//     const HamletName = importedDataItem.hamletName;
+//     const CtyProvinceName = importedDataItem.ctyName;
+//     const WardName = importedDataItem.wardName;
+//     const DistrictName = importedDataItem.districtName;
+//     const RoleName = importedDataItem.roleName;
+
+//     const positions = await Position.findIdByName({ PositionName });
+//     importedDataItem.positionId = positions.id;
+
+//     const partycells = await PartyCell.findIdByName({ PartycellName });
+//     importedDataItem.partycellId = partycells.id;
+
+//     const hamlets = await hamletsServices.findIdByName({ HamletName, DistrictName, WardName, CtyProvinceName});
+//     importedDataItem.hamletId = hamlets.idHamlet;
+
+//     const roles = await Role.findIdByName({ RoleName });
+//     importedDataItem.roleId = roles.roleId;
+
+//     const account = await http_create(Account, importedDataItem);
+
+//     if (account.user_name) {
+//       const result = await http_create(PartyMember, importedDataItem);
+
+//       if (!result.error) {
+//         alert_success(
+//           `Thêm đảng viên`,
+//           `Đảng viên "${result.document.name}" đã được tạo thành công.`
+//         );
+//       } else {
+//         alert_error(`Thêm đảng viên`, `${result.msg}`);
+//       }
+//     } else {
+//       alert_error(`Thêm đảng viên`, `${account.msg}`);
+//     }
+//   },
+
+//   setAccount() {
+//     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+//     let password = "";
+//     for (let i = 0; i < 9; i++) {
+//       const randomIndex = Math.floor(Math.random() * charset.length);
+//       password += charset[randomIndex];
+//     }
+//     return password;
+//   },
+// }
+
 
 };
 </script>

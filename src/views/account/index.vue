@@ -1,12 +1,12 @@
 <script>
-import Add from "./add.vue";
-import FormWizard from "../../components/form/form-wizard.vue";
+// import Add from "./add.vue";
+
 import Table from "../../components/table/table_account.vue";
 import Pagination from "../../components/table/pagination.vue";
 import Dropdown from "../../components/form/dropdown.vue";
 import Select from "../../components/form/select.vue";
 import Search from "../../components/form/search.vue";
-import Select_Advanced from "../../components/form/select_advanced.vue";
+
 import { reactive, computed, watch, ref, onBeforeMount, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
@@ -16,7 +16,7 @@ import Role from "../../services/role.service";
 import { http_getAll, http_create, http_getOne, http_deleteOne, http_update } from "../../assets/js/common.http";
 import { alert_success, alert_error, alert_delete, alert_warning, alert_info, alert_delete_wide, alert_input_text, alert_mail } from "../../assets/js/common.alert";
 
-import { isReadAccount } from '../../use/getSessionItem'
+
 
 export default {
   components: {
@@ -25,9 +25,9 @@ export default {
     Dropdown,
     Select,
     Search,
-    Add,
-    Select_Advanced,
-    FormWizard,
+    
+  
+    
   },
   setup(ctx) {
     const data = reactive({
@@ -216,14 +216,14 @@ export default {
       refresh,
       updateEntryValueRoleAccount,
       handleSelectAll,
-      isReadAccount
+      
     };
   },
 };
 </script>
 
 <template>
-  <div class="border-box d-flex flex-column ml-2" v-if="isReadAccount()">
+  <div class="border-box d-flex flex-column ml-2" >
     <!-- Menu -->
     <div class="d-flex menu my-3 mx-3 justify-content-end">
       <router-link :to="{ name: 'Account' }" @click="activeMenu = 1"
@@ -245,25 +245,7 @@ export default {
     <div class="border-hr mb-3"></div>
     <div class="d-flex justify-content-between mx-3 mb-3">
       <div class="d-flex justify-content-start">
-        <Select class="d-flex justify-content-start" :options="[
-          {
-            name: 5,
-            value: 5,
-          },
-          {
-            name: 10,
-            value: 10,
-          },
-          {
-            name: 20,
-            value: 20,
-          },
-          {
-            name: 30,
-            value: 30,
-          },
-        ]" style="width: 125px" :title="`Số bản ghi`" @update:entryValue="(value) => (data.entryValue = value)"
-          :entryValue="data.entryValue" @refresh="(data.entryValue = 'All'), (data.currentPage = 1)" />
+        
         <Search class="ml-3" style="width: 300px; height: 40px;" @update:searchText="(value) => (data.searchText = value)"
           :entryValue="data.searchText" @choseSearch="async (value) => (
 

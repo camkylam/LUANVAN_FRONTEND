@@ -72,26 +72,26 @@ const routes = [
         name: "CommentByYear",
         component: () => import("../views/CommentByYear/index.vue"),
       },
-      {
-        path: "position",
-        name: "Position",
-        component: () => import("../views/position/index.vue"),
-      },
-      {
-        path: "/position/:id",
-        name: "Position.view",
-        component: () => import("../views/position/view.vue"),
-      },
-      {
-        path: "/ward",
-        name: "Ward",
-        component: () => import("../views/ward/ward.vue"),
-      },
-      {
-        path: "/ward/:id",
-        name: "Ward.view",
-        component: () => import("../views/ward/index.vue"),
-      },
+      // {
+      //   path: "position",
+      //   name: "Position",
+      //   component: () => import("../views/position/index.vue"),
+      // },
+      // {
+      //   path: "/position/:id",
+      //   name: "Position.view",
+      //   component: () => import("../views/position/view.vue"),
+      // },
+      // {
+      //   path: "/ward",
+      //   name: "Ward",
+      //   component: () => import("../views/ward/ward.vue"),
+      // },
+      // {
+      //   path: "/ward/:id",
+      //   name: "Ward.view",
+      //   component: () => import("../views/ward/index.vue"),
+      // },
      
       {
         path: "account",
@@ -123,11 +123,11 @@ const routes = [
         name: "CommentByOpinion",
         component: () => import("../views/CommentByOpinion/index.vue")
       },
-      {
-        path: "YetRecommendation",
-        name: "YetRecommendation",
-        component: () => import("../views/YetRecommendation/index.vue")
-      }
+      // {
+      //   path: "YetRecommendation",
+      //   name: "YetRecommendation",
+      //   component: () => import("../views/YetRecommendation/index.vue")
+      // }
     ],
   },
 ];

@@ -50,7 +50,7 @@
       </tbody>
     </table>
     <p v-if="comments == ''" class="text-center mt-2" style="font-weight: bold;">
-    Chưa có phiếu nhận xét cho đảng viên.
+    Chưa có phiếu xin ý kiến cho đảng viên.
   </p>
   </div>
 </template>
@@ -71,7 +71,7 @@ export default {
     },
     fields: {
       type: Array,
-      default: ["Name", "Age", "Payment"],
+      default: [],
     },
     labels: {
       type: Array,

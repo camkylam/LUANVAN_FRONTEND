@@ -62,7 +62,7 @@ export default {
     },
     fields: {
       type: Array,
-      default: ["Name", "Age", "Payment"],
+      default: [],
     },
     labels: {
       type: Array,

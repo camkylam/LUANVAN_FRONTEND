@@ -1,5 +1,6 @@
-<!-- <script>
-import { ref, reactive } from 'vue';
+<script>
+import { ref, reactive,  computed } from 'vue';
+import { useRouter, useRoute } from "vue-router";
 import OpinionServices from "../../services/opinion.service";
 import commentService from '../../services/comment.service';
 import { alert_success, alert_error, alert_delete, alert_warning } from "../../assets/js/common.alert";
@@ -8,129 +9,6 @@ import { formatDate } from "../../assets/js/common";
 import mailService from "../../services/mail.service";
 import accountService from "../../services/account.service";
 import { comfirmComment,signedComment } from "../../use/getSessionItem";
-export default {
-  name: "Assessment",
-  props: {
-    item: {
-      type: Object,
-      default: {},
-    },
-    criterion: {
-      type: Array,
-      default: [],
-    },
-    commentById: {
-      type: Object,
-      default: {},
-    }
-  },
-  setup(props, ctx) {
-    const selectedCriterion = reactive({});
-    const data = reactive({
-      item: {
-        evaluations: [],
-      },
-    });
-
-    const isAllCriterionSelected = () => {
-  return !Object.values(selectedCriterion).some(value => typeof value === 'undefined' || value === '');
-};
-
-    const note = ref("")
-    const create = async () => {
-
-      console.log("isAllCriterionSelected:", isAllCriterionSelected());
-      console.log("selectedCriterion:", selectedCriterion);
-
-      if (!isAllCriterionSelected()) {
-        alert_warning("Vui lòng chọn lần lượt hết các tiêu chí.");
-        return;
-      }
-
-      const _idPartyMember = sessionStorage.getItem('partymemberId');
-      data.item.partymemberId = props.item._id;
-      data.item.commentedBy = _idPartyMember;
-      data.item.note = note.value;
-      // console.log(data.item.note);
-    
-      data.item.evaluations = Object.values(selectedCriterion).filter(value => value !== '');
-      // console.log(data.item.evaluations);
-    
-      const opinion = await OpinionServices.getByPartymember(props.item._id);
-      // console.log(opinion);
-    
-      if (opinion.document.length > 0) {
-        const oldestItem = opinion.document[0];
-        const oldestItemId = oldestItem._id;
-        data.item.opinionId = oldestItemId;
-        // console.log("ID của phần tử cũ nhất:", oldestItemId);
-      } else {
-        // console.log("Không có phần tử trong mảng.");
-      }
-      // console.log("ID của phần tử mới nhất:", data.item.opinionId);
-
-      const roleIdWard = "601b19c4-381f-4e44-98b7-e44f09f4f405"
-      const wardId = props.item.Hamlet.Ward._id
-      const roleEmails = await accountService.getEmailFromRoleAndWard({roleIdWard, wardId})
-      // console.log(roleEmails)
-      const dataMail = reactive({
-        title: "Xác nhận phiếu nhận xét cho đảng viên",
-        content: `<p><span style="text-transform: capitalize;">Trân</span> trọng kính chào ông/bà</p>
-                  <p><span style="text-transform: capitalize;">Kính</span> mời quý ông/bà vào hệ thống quản lý đảng viên sinh hoạt nơi cư trú trường công 
-                  nghệ thông tin và truyền thông xác nhận phiếu nhận xét của đảng viên <span style="text-transform: capitalize;"><b>${props.item.name}</b></span> </p>
-                  <p><span style="text-transform: capitalize;">Mong</span> quý ông/bà thực hiện sớm</p>
-                  <p><span style="text-transform: capitalize;">Chân</span> thành cảm ơn ông/bà</p>
-                  <p><span style="text-transform: capitalize;">Chúc</span> quý ông/bà nhiều sức khỏe</p>
-                  <p><span style="text-transform: capitalize;">Trân</span> trọng,</p>
-                  <p>Admin</p>`,
-        mail: roleEmails.join(', '), // Gán danh sách email vào đây
-      });
-    
-      const comment = await commentService.create(data.item);
-      if (!comment.error) {
-        alert_success("Đã xác nhận thành công phiếu nhận xét");
-        await new Promise(resolve => setTimeout(resolve, 1500)); // Đợi 1 giây (thay đổi thời gian cần thiết)
-        window.location.reload();
-        await mailService.sendmail(dataMail);
-        ctx.emit("create");
-      } else if (comment.error) {
-        alert_delete("Lỗi!, xác nhận không thành công", `${comment.msg}`);
-      }
-    };
-    return {
-      selectedCriterion,
-      note,
-      create,
-      currentDate: '',
-      comfirmComment,
-      signedComment
-    };
-  },
-  mounted() {
-    this.getCurrentDate();
-  },
-  methods: {
-    getCurrentDate() {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = (now.getMonth() + 1).toString().padStart(2, '0');
-      const day = now.getDate().toString().padStart(2, '0');
-      this.currentDate = `${day}/${month}/${year}`;
-    }
-  }
-};
-</script> -->
-<script>
-import { ref, reactive, computed } from 'vue';
-import OpinionServices from "../../services/opinion.service";
-import commentService from '../../services/comment.service';
-import { alert_success, alert_error, alert_delete, alert_warning } from "../../assets/js/common.alert";
-import { http_getAll, http_create, http_getOne, http_update } from "../../assets/js/common.http";
-import { formatDate } from "../../assets/js/common";
-import mailService from "../../services/mail.service";
-import accountService from "../../services/account.service";
-import { comfirmComment, signedComment } from "../../use/getSessionItem";
-
 export default {
   name: "Assessment",
   props: {
@@ -167,42 +45,31 @@ export default {
     return selectedValue !== '' && typeof selectedValue !== 'undefined';
   });
 });
-    const note = ref("");
 
+
+    const note = ref("")
     const create = async () => {
       if (!isAllCriterionSelected.value) {
         alert_warning("Vui lòng chọn tất cả các tiêu chí.");
         return;
       }
 
-      // Các bước xác nhận tiêu chí và gửi mail ở đây
-
       const _idPartyMember = sessionStorage.getItem('partymemberId');
       data.item.partymemberId = props.item._id;
       data.item.commentedBy = _idPartyMember;
       data.item.note = note.value;
-      // console.log(data.item.note);
     
       data.item.evaluations = Object.values(selectedCriterion).filter(value => value !== '');
-      // console.log(data.item.evaluations);
-    
-      const opinion = await OpinionServices.getByPartymember(props.item._id);
-      // console.log(opinion);
-    
-      if (opinion.document.length > 0) {
-        const oldestItem = opinion.document[0];
-        const oldestItemId = oldestItem._id;
-        data.item.opinionId = oldestItemId;
-        // console.log("ID của phần tử cũ nhất:", oldestItemId);
-      } else {
-        // console.log("Không có phần tử trong mảng.");
-      }
-      // console.log("ID của phần tử mới nhất:", data.item.opinionId);
-
-      const roleIdWard = "601b19c4-381f-4e44-98b7-e44f09f4f405"
-      const wardId = props.item.Hamlet.Ward._id
-      const roleEmails = await accountService.getEmailFromRoleAndWard({roleIdWard, wardId})
-      // console.log(roleEmails)
+      data.item.opinionId = props.opinionId
+      console.log(data.item.opinionId )
+    // const opinion = await OpinionServices.getByPartymember(props.item._id);
+    const roleIdWard = "601b19c4-381f-4e44-98b7-e44f09f4f405"
+  const wardId = props.item.Hamlet.Ward._id
+  const roleEmails = await accountService.getEmailFromRoleAndWard({roleIdWard, wardId})
+  if (roleEmails.error) {
+    alert_error("Lỗi khi lấy email từ vai trò và xã", `${roleEmails.msg}`);
+    return; 
+  }
       const dataMail = reactive({
         title: "Xác nhận phiếu nhận xét cho đảng viên",
         content: `<p><span style="text-transform: capitalize;">Trân</span> trọng kính chào ông/bà</p>
@@ -226,23 +93,24 @@ export default {
       } else if (comment.error) {
         alert_delete("Lỗi!, xác nhận không thành công", `${comment.msg}`);
       }
+    //   if(roleEmails.error ){
+    //     alert_delete("Đảng viên đã chuyển sinh hoạt");
+    //   }
+      // console.log(comment);
     };
-
+    
     return {
       selectedCriterion,
       note,
       create,
       currentDate: '',
       comfirmComment,
-      signedComment,
-      isAllCriterionSelected
+      signedComment
     };
   },
-
   mounted() {
     this.getCurrentDate();
   },
-
   methods: {
     getCurrentDate() {
       const now = new Date();
@@ -277,7 +145,7 @@ export default {
                     <div class="d-flex justify-content-around row mx-3" >
                 <div class="mt-3 col-6">
                   <p style="font-size: 17px; text-transform: capitalize;">
-                    <span >Mã số Đảng viên: </span>
+                    <span style="font-size: 17px; text-transform: capitalize;">Mã số Đảng viên: </span>
                     {{ item.code }}
                   </p>
                   <p style="font-size: 17px; text-transform: capitalize;">

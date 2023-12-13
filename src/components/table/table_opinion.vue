@@ -26,12 +26,15 @@
           <td class="size-16">{{ item.Recommendation?.PartyMember?.Hamlet?.Ward?.District?.Cty_Province?.name }}</td>
           <td class="">
             <div class="d-flex align-items-center" v-if="activeAction == true">
-              <button type="button" class="format-btn" data-toggle="modal" data-target="#model-opinion">
+              <button type="button" class="format-btn" data-toggle="modal" data-target="#model-opinion" >
                 <span
-                  id="opinion"
-                  class="material-symbols-outlined d-flex align-content-center"
-                  
-                  @click="$emit('getbyId', item._id, item)"
+                id="opinion"
+  class="material-symbols-outlined d-flex align-content-center"
+  :class="{
+    'blue-button-class': item.SentBy !== null && item.BuildBy !== null,
+    'green-button-class': item.SentBy === null && item.BuildBy !== null,
+  }" style="border: 1px solid black;"
+  @click="$emit('getbyId', item._id, item)"
                 >
                   Demography
                 </span>
@@ -57,30 +60,7 @@
     </p>
 
     <!-- Thêm div để chứa nội dung cần xuất PDF -->
-    <div ref="pdfContent" style="display: none;">
-      <table class="my-table">
-        <thead>
-          <tr>
-            <th><span class="size-16">Stt</span></th>
-            <!-- Thêm tiêu đề của các cột -->
-            <th v-for="(value, index) in fields" :key="index">
-              <span class="size-16">{{ value }}</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in opinions" :key="index">
-            <td class="size-16">{{ startRow + index }}</td>
-            <td class="size-16">{{ item.createdAt }}</td>
-            <td class="size-16">{{ item.Recommendation?.PartyMember?.Hamlet?.name }}</td>
-            <td class="size-16">{{ item.Recommendation?.PartyMember?.Hamlet?.Ward?.name }}</td>
-            <td class="size-16">{{ item.Recommendation?.PartyMember?.Hamlet?.Ward?.District?.name }}</td>
-            <td class="size-16">{{ item.Recommendation?.PartyMember?.Hamlet?.Ward?.District?.Cty_Province?.name }}</td>
-            <!-- Thêm nội dung của các cột khác nếu cần -->
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    
   </div>
 </template>
 
@@ -167,102 +147,7 @@ export default {
         window.URL.revokeObjectURL(url);
       });
     },
-
-    // Hàm để xuất dữ liệu vào PDF
-    exportToPDF() {
-      const content = this.$refs.pdfContent;
-
-      const pdfOptions = {
-        margin: 10,
-        filename: 'danh_sach.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      };
-
-      html2pdf().from(content).set(pdfOptions).outputPdf().then((pdf) => {
-        this.downloadPdfFile(pdf, pdfOptions.filename);
-      });
-    },
-
-    // Hàm để xuất dữ liệu vào PDF cho từng item
-    // exportItemToPDF(item) {
-    //   // Tạo một div để chứa nội dung cần xuất ra PDF
-    //   const contentDiv = document.createElement('div');
-    //   contentDiv.classList.add('my-table');
-
-    //   // Thêm chữ "PHIẾU XIN Ý KIẾN"
-    //   const titleDiv = document.createElement('div');
-    //   titleDiv.innerText = 'PHIẾU XIN Ý KIẾN';
-    //   titleDiv.style.textAlign = 'center';
-    //   titleDiv.style.fontWeight = 'bold';
-    //   contentDiv.appendChild(titleDiv);
-
-    //   // Thêm tiêu đề của các cột
-    //   const headerRow = document.createElement('div');
-    //   headerRow.classList.add('my-table');
-    //   this.fields.forEach((field) => {
-    //     const span = document.createElement('span');
-    //     span.classList.add('size-16');
-    //     span.innerText = field;
-    //     headerRow.appendChild(span);
-    //   });
-    //   contentDiv.appendChild(headerRow);
-
-    //   // Thêm dòng dữ liệu cho item hiện tại
-    //   const dataRow = document.createElement('div');
-    //   dataRow.classList.add('my-table');
-    //   Object.values(item).forEach((value) => {
-    //     const span = document.createElement('span');
-    //     span.classList.add('size-16');
-    //     span.innerText = value;
-    //     dataRow.appendChild(span);
-    //   });
-    //   contentDiv.appendChild(dataRow);
-
-    //   // Tạo tùy chọn cho file PDF
-    //   const pdfOptions = {
-    //     margin: 10,
-    //     filename: 'item_' + item._id + '.pdf',
-    //     image: { type: 'jpeg', quality: 0.98 },
-    //     html2canvas: { scale: 2 },
-    //     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    //   };
-
-    //   // Xuất file PDF từ nội dung được tạo
-    //   html2pdf().from(contentDiv).set(pdfOptions).outputPdf().then((pdf) => {
-    //     // Gọi hàm để download file PDF
-    //     this.downloadPdfFile(pdf, pdfOptions.filename);
-    //   });
-    // },
-    exportItemToPDF(item) {
-      // Tạo một đối tượng jsPDF
-      const pdf = new jsPDF();
-
-      pdf.text(`Ngày xin ý kiến: ${item.createdAt}`, 10, 10);
-pdf.text(`Khu vực, ấp: ${item.Recommendation?.PartyMember?.Hamlet?.name || ''}`, 10, 20);
-pdf.text(`Xã, phường: ${item.Recommendation?.PartyMember?.Hamlet?.Ward?.name || ''}`, 10, 30);
-pdf.text(`Quận, huyện: ${item.Recommendation?.PartyMember?.Hamlet?.Ward?.District?.name || ''}`, 10, 40);
-pdf.text(`Tỉnh, thành phố: ${item.Recommendation?.PartyMember?.Hamlet?.Ward?.District?.Cty_Province?.name || ''}`, 10, 50);
-
-      // Lưu file PDF hoặc hiển thị nó ngay trên trình duyệt
-      pdf.save(`item_${item._id}.pdf`);
-    },
   
-    // Hàm download file PDF
-    downloadPdfFile(pdf, fileName) {
-      const blob = new Blob([pdf], { type: 'application/pdf' });
-
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      window.URL.revokeObjectURL(url);
-    },
   },
   props: {
     opinions: {
@@ -271,7 +156,7 @@ pdf.text(`Tỉnh, thành phố: ${item.Recommendation?.PartyMember?.Hamlet?.Ward
     },
     fields: {
       type: Array,
-      default: ["Name", "Age", "Payment"],
+      default: [],
     },
     labels: {
       type: Array,
@@ -296,21 +181,32 @@ pdf.text(`Tỉnh, thành phố: ${item.Recommendation?.PartyMember?.Hamlet?.Ward
   },
 };
 </script>
-
-
-
-
 <style scoped>
-  .your-blue-button-class {
-    background-color: blue;
-    color: white;
+   /* .blue-button-class {
+    background-color: blue; 
+    color: white; 
   }
 
-  .your-yellow-button-class {
-    background-color: yellow;
-    color: black;
-  }
+  .green-button-class {
+    background-color: green; 
+    color: white; 
+  } */
 
+  .green-button-class {
+  background-color: rgb(12, 150, 12);
+  color: white;
+  border: 1px solid black;
+}
+/* .your-yellow-button-class {
+  background-color: rgb(228, 228, 40);
+  color: rgb(14, 13, 13);
+  border: 1px solid black;
+} */
+.blue-button-class{
+  background-color: rgb(60, 128, 255);
+  color: white;
+  border: 1px solid black;
+}
   /* .my-table {
     width: 90%;
     border-collapse: collapse;

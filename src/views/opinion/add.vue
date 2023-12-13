@@ -8,7 +8,7 @@ import { formatDate } from "../../assets/js/common";
 import { reactive } from "vue";
 import { isCreateRecommendation, isComfirmRecommendation, isAcceptRecommendation } from "../../use/getSessionItem";
 import opinionService from "../../services/opinion.service";
-import { isComfirmOpinion } from "../../use/getSessionItem";
+import { isComfirmOpinion,signedOpinion } from "../../use/getSessionItem";
 import mailService from "../../services/mail.service";
 import accountService from "../../services/account.service";
 
@@ -55,20 +55,23 @@ export default {
           `Gửi phiếu thành công phiếu xin ý kiến`,
           `${opinion.msg}`
         );
+        await new Promise(resolve => setTimeout(resolve, 1500)); // Đợi 1 giây (thay đổi thời gian cần thiết)
+      window.location.reload();
         await mailService.sendmail(dataMail);
         ctx.emit("create");
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Đợi 1 giây (thay đổi thời gian cần thiết)
-      window.location.reload();
+        //refresh();
+       
       } else {
         alert_error(`Phiếu xin ý kiến chưa được gửi`, `${opinion.msg}`);
       }
+     
     }
-
     return {
       data,
       create,
       currentDate: '',
-      isComfirmOpinion
+      isComfirmOpinion,
+      signedOpinion
     }
   },
   mounted() {
@@ -134,7 +137,7 @@ export default {
                         class="btn btn-warning ml-3 mr-3"
                         data-toggle="modal"
                         
-                        :disabled="isComfirmOpinion() ? false : true"
+                        :disabled="signedOpinion() ? false : true"
                     >
                     <span class="mx-2" style="color: white">Xác nhận</span></button>
                     </div>
@@ -146,6 +149,7 @@ export default {
                         data-toggle="modal"
                         @click="create"
                         id="add"
+                        :disabled="isComfirmOpinion() ? false : true"
                     >
                     <span class="mx-2" style="color: white">Gửi</span>
                     </button>

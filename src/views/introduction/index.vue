@@ -11,7 +11,7 @@ import View from "./view.vue";
 import Introduction from "./introduction_form.vue";
 import Opinion from "./opinion_form.vue";
 import Assessment from "./assessment_form.vue";
-import Select_Advanced from "../../components/form/select_advanced.vue";
+
 import Index from "../CommentByYear/index.vue";
 
 import Comment from "../../views/comment/index.vue"
@@ -30,7 +30,7 @@ import CtyServices from "../../services/cty_province.service";
 import districtsServices from "../../services/district.service";
 import wardsServices from "../../services/ward.service";
 import Swal from "sweetalert2";
-import FormWizard from "../../components/form/form-wizard.vue";
+
 import { http_getAll, http_create, http_getOne, http_deleteOne, http_update } from "../../assets/js/common.http";
 import { alert_success, alert_error, alert_delete, alert_warning, alert_delete_wide } from "../../assets/js/common.alert";
 import { formatDate, searchData, updateItems, updateRows, setNumberOfPages, setPagination } from "../../assets/js/common";
@@ -49,9 +49,7 @@ export default {
     Search,
     DeleteAll,
     View,
-    Select_Advanced,
     Mail,
-    FormWizard,
     SelectCDU,
     Introduction,
     Opinion,
@@ -60,6 +58,7 @@ export default {
     Index
   },
   setup(ctx) {
+    const arrayCheck = reactive({ data: [] });
     const data = reactive({
       info: partymemberModel,
       members: [ // to display table for tan, tai
@@ -73,11 +72,10 @@ export default {
       ],
       itemType: "",
 
-      // to create new recommendation for introValue member
       recommendation: recommedationModel,
       introValue: partymemberModel,
 
-      entryValue: 5,
+      entryValue: 30,
       numberOfPages: 1,
       totalRow: 0,
       startRow: 0,
@@ -85,13 +83,12 @@ export default {
       currentPage: 1,
       searchText: "",
 
-      // to display detail info of selected member
       viewValue: partymemberModel,
-      // to create new recommendation
+     
       introValue: partymemberModel,
-      //to create new opinion
+    
       renewValue: partymemberModel,
-      //to create new comment
+      
       assessValue: partymemberModel,
 
       recommendation: recommedationModel,
@@ -118,17 +115,10 @@ export default {
   const renewOpinion = async (value) => {
     router.push({ name: "Form.opinion", params: { id: `${value}` } });
     data.comment = await CommentServices.getByPartymember(value._id);
-    // console.log(data.comment)
-    setTimeout(() => {
-    window.location.reload();
-  }, 200); 
   };
 
   const renewAssess = (value) => {
       router.push({ name: "Form.comment", params: { id: `${value}` } });
-      setTimeout(() => {
-    window.location.reload();
-  }, 200); 
     };
 
     // Send new recommendation
@@ -136,27 +126,7 @@ export default {
       router.push({ name: "Form.recommendation", params: { id: `${value}` } });
       data.introValue = await PartyMember.get(value);
       const recommendation = await Recommentdation.get(data.introValue._id)
-      setTimeout(() => {
-    window.location.reload();
-  }, 200); 
     };
- 
-    const YetRecommendation = async(value) => {
-        //YetRecommendation
-        router.push({ name: "YetRecommendation"});
-      }
-
-    const CommentByYear = async () => {
-      const yearInputValue = document.getElementById('yearInput').value.trim();
-
-    // Check if the input is not empty
-    if (yearInputValue !== '') {
-      // Navigate to the CommentByYear route with the query parameter
-      router.push({ name: "CommentByYear", query: { year: yearInputValue } });
-    } else {
-      alert_error("Vui lòng nhập năm trước khi tổng hợp.")
-    }
-  };
     
     const toString = computed(() => searchData(
       data.choseSearch,
@@ -173,22 +143,13 @@ export default {
         (data.itemType === 'members') ? data.members : ((data.itemType === 'accept') ? data.accept : data.recommendations),
         filter
       )
+     
       data.totalRow = result.totalRow
       return result.items
+     
     })
     const totalPages = computed(() => setNumberOfPages(filtered.value.length, data.entryValue))
     const setPages = computed(() => setPagination(data, totalPages, filtered))
-
-    const entryValuePartyCell = ref(""); //id
-    const entryNamePartyCell = ref("Chi bộ"); //name
-    const entryValuePosition = ref(""); //id
-    const entryNamePosition = ref("Chức vụ"); //name
-    const entryValueCty = ref("");
-    const entryNameCty = ref("Tỉnh, thành phố");
-    const entryValueDistrict = ref(""); //id
-    const entryNameDistrict = ref("Quận, huyện"); //name
-    const entryValueWard = ref("");
-    const entryNameWard = ref("Xã, phường");
 
     //FRESH
     const refresh = async () => {
@@ -201,7 +162,6 @@ export default {
         case "đảng viên":
           data.itemType = 'info'
           data.info = await PartyMember.get(_idPartyMember)
-          console.log(data.info)
           break
         case "bí thư chi bộ trường cnnt và tt":
           cellIds = [data.info.PartyCell._id]
@@ -241,7 +201,6 @@ export default {
             const accept = await Recommentdation.getAllByWard({status, hamletId})
             if(!accept.error){
               data.accept = accept.document
-              // console.log(data.accept)
             }
           break
       }
@@ -250,7 +209,6 @@ export default {
           data.opinion = await OpinionServices.getByPartymember(_idPartyMember);
           data.comment = await CommentServices.getByPartymember(_idPartyMember);
       }
-          //data.comment = value.comment
 
       if (data.itemType == 'members')
         for (let value of data.members) {
@@ -289,113 +247,6 @@ export default {
     // watch
     const activeMenu = ref(1);
 
-    // ****** LỌC ******
-    watch(entryValuePosition, async (newValue, oldValue) => {
-      data.comment = [];
-
-      if (newValue == "") {
-        data.currentPage = 1;
-        await refresh();
-        return;
-      }
-      data.currentPage = 1;
-
-      data.members = await http_getAll(partymemberService);
-      //1.lấy danh sách đảng viên chức vụ x
-      if (entryValuePosition.value.length > 0) {
-        data.members = data.items.filter((val) => {
-          return val.positionId == entryValuePosition.value;
-        });
-      }
-      if (
-        entryValueCty.value != "" &&
-        entryValueDistrict.value != "" &&
-        entryValueDistrict.value != "1" &&
-        entryValueWard.value != "" &&
-        entryValueWard.value != "1"
-      ) {
-        data.members = data.items.filter((value) => {
-          return (
-            value.Hamlet.Ward.District.Cty_Province._id == entryValueCty.value &&
-            value.Hamlet.Ward.District._id == entryValueDistrict.value &&
-            value.Hamlet.Ward._id == entryValueWard.value
-          );
-        });
-      }
-      //2. chọn 1 Tỉnh, thành phố và 1 quận, huyện
-      else if (
-        entryValueCty.value != "" &&
-        entryValueDistrict.value != "" &&
-        entryValueDistrict.value != "1"
-      ) {
-        data.members = data.items.filter((value) => {
-          return (
-            value.Ward.District.Cty_Province._id == entryValueCty.value &&
-            value.Ward.District._id == entryValueDistrict.value
-          );
-        });
-      } else if (entryValueCty.value != "") {
-        data.members = data.items.filter((val) => {
-          return (
-            val.Ward.District.Cty_Province._id == entryValueCty.value
-          );
-        });
-      }
-      //Thay đổi
-      data.selectAll[0].checked = false;
-      for (let value of data.members) {
-        value.checked = false;
-        data.renewValue = await PartyMember.get(value._id);
-          value.recommendation = await Recommentdation.get(value._id);
-          // console.log(value.recommendation.recommendationStatus);
-          value.comment = await CommentServices.getByPartymember(value._id);
-          // console.log(value.comment.document )
-          data.comment.push(value.comment);
-      }
-      for (let value of data.members) {
-        for (let array of arrayCheck.data) {
-          if (array._id == value._id) {
-            value.checked = true;
-            data.renewValue = await PartyMember.get(value._id);
-            value.recommendation = await Recommentdation.get(value._id);
-            // console.log(value.recommendation.recommendationStatus);
-            value.comment = await CommentServices.getByPartymember(value._id);
-          // console.log(value.comment.document )
-          data.comment.push(value.comment);
-            break;
-          }
-          value.checked = false;
-        }
-      }
-    });
-    const updateEntryValuePosition = (value) => {
-      entryValuePosition.value = value;
-    };
-
-    watch(entryValuePartyCell, async (newValues, oldValues) => {
-      // Ensure newValues is an array
-      const selectedPartyCells = Array.isArray(newValues) ? newValues : [newValues].filter(cell => cell !== "");
-
-      if (selectedPartyCells.length === 0) {
-        data.currentPage = 1;
-        await refresh();
-        return;
-      }
-
-      data.currentPage = 1;
-
-      // Fetch all party members
-      data.members = await http_getAll(PartyMember);
-
-      // Filter based on selected "Chi bộ" values
-      data.members = data.items.filter(val => selectedPartyCells.includes(val.PartyCell._id));
-
-      // Rest of your code for changing the 'checked' property
-    });
-    const updateEntryValuePartyCell = (value) => {
-      entryValuePartyCell.value = value;
-    };
-
     const handleSelectAll = (value, itemType) => {
       arrayCheck.data = [];
       if (value == false) {
@@ -406,6 +257,7 @@ export default {
           }
         if (itemType == 'recommendations')
           for (let value1 of data.recommendations) {
+           
             value1.checked = true;
             arrayCheck.data.push(value1);
           }
@@ -501,11 +353,10 @@ export default {
         if (result.dismiss === Swal.DismissReason.timer) {
         }
       });
-
       for (let i = 0; i < arrayCheck.data.length; i++) {
         if (arrayCheck.data[i].checked == true) {
-          try {
-            dataMail.mail = arrayCheck.data[i].email;
+            try {
+            dataMail.mail = arrayCheck.data[i].email || arrayCheck.data[i].PartyMember.email;
             await mailService.sendmail(dataMail);
           } catch (error) {
             console.error("Error sending email:", error);
@@ -523,6 +374,7 @@ export default {
     return {
       data,
       setPages,
+      arrayCheck,
       activeMenu,
       refresh,
       sendEmail,
@@ -532,22 +384,10 @@ export default {
       renewOpinion,
       renewIntro,
       renewAssess,
-      CommentByYear,
-      entryValuePosition,
-      entryNamePosition,
-      entryValuePartyCell,
-      entryNamePartyCell,
-      entryValueCty,
-      entryNameCty,
-      entryValueDistrict,
-      entryNameDistrict,
-      entryValueWard,
-      entryNameWard,
+      // CommentByYear,
       handleSelectAll,
       handleSelectOne,
-      updateEntryValuePosition,
-      updateEntryValuePartyCell,
-      YetRecommendation,
+      // YetRecommendation,
 
       // phân quyền
       isDeletePartyMember,
@@ -555,8 +395,6 @@ export default {
       isReadPartyMember,
       isCreatePartyMember,
       isMail,
-
-      yearInputValue: "",
     };
   },
 };
@@ -574,7 +412,7 @@ export default {
 
     <div class="border-hr mb-3"></div>
     <div class="d-flex justify-content-between mx-3 mb-3">
-      <div class="d-flex justify-content-start">
+      <div class="d-flex justify-content-start" >
         <Search class="ml-3" style="width: 300px" @update:searchText="(value) => (data.searchText = value)"
           :entryValue="data.searchText"
           @choseSearch="async (value) => ((data.choseSearch = value), (data.currentPage = 1))"
@@ -608,35 +446,11 @@ export default {
 
     <div class="border-hr mb-3"></div>
     <div class="d-flex">
-
-      <div v-if="data.itemType == 'members'" class="d-flex align-items-start justify-content-between w-100">
-    <!-- <form @submit.prevent="CommentByYear">
-      <p style="font-size: 17px; padding-left: 30px;">Tổng hợp phiếu nhận xét theo năm</p>
-      <div class="d-flex justify-content-between mx-3 mb-3">
-        <div class="d-flex align-items-start">
-          <input v-model="yearInputValue" id="yearInput" class="ml-3" style="width: 300px; border: 1px solid var(--gray); border-radius: 5px; position: relative; width: 200%; height: 100%;" placeholder="Nhập năm cần tổng hợp">
-          <button type="submit" class="btn btn-info ml-3 mr-3" data-toggle="modal">
-            <span class="mx-2" style="color: white">Tổng hợp</span>
-          </button>
-        </div>
-      </div>
-    </form> -->
-    <!-- Pass the value to the child component -->
-    <router-link :to="{ name: 'CommentByYear', query: { year: yearInputValue } }"></router-link>
-  </div>
-  <!-- <div v-if="data.itemType == 'members'" class="d-flex align-items-end justify-content-end" style="margin-bottom: 15px;" >
-    
-    <button type="submit" class="btn btn-info ml-3 mr-3" data-toggle="modal" @click="YetRecommendation">
-            <span>Đảng viên chưa có thư giới thiệu</span>
-        </button>
-  </div> -->
     </div>
-    <!-- Kết thúc tổng hợp phiếu nhận xét theo năm -->
     
     <!-- Table -->
     <Table :itemType='data.itemType' :opinion="data.opinion" :recommendation='data.recommendation' :comment="data.comment" :items="setPages" :info="data.info" :fields="[
       'Tên',
-      // 'Mã Đảng viên',
       'Mã Đảng viên',
       'Chi bộ',
       'Giới tính',

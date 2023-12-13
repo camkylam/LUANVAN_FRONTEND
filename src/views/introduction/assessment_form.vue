@@ -28,28 +28,25 @@ export default {
       return [];
     });
 
-    
-
     const signed = async () => {
       const _idPartyMember = sessionStorage.getItem('partymemberId');
       data.item.signedBy = _idPartyMember;
       data.item.commentId = props.commentById._id;
 
-      const roleId="c11cb49c-fc67-4f79-84dc-d04ecb98bf8c";
-      const partycellId=props.item.partycellId
-      const roleEmail = await accountService.getEmailByRolePartyCell({roleId,partycellId })
-      // console.log(roleEmail)
-      const dataMail = reactive({
-        title: "Thông tin phiếu nhận xét của đảng viên",
-        content: `<h2>Trân trọng kính chào ông/bà</h2>
-                  <p>Kính mời quý ông/bà vào hệ thống quản lý đảng viên sinh hoạt nơi cư trú trường công 
-                  nghệ thông tin và truyền thông xem thông tin phiếu nhận xét của đảng viên <b>${props.item.name}</b> </p>
-                  <p>Chân thành cảm ơn ông/bà</p>
-                  <p>Chúc quý ông/bà nhiều sức khỏe</p>
-                  <p>Trân trọng,</p>
-                  <p>Admin</p>`,
-        mail: roleEmail.join(', '),// Gán danh sách email vào đây
-      });
+      // const roleIdWard="c11cb49c-fc67-4f79-84dc-d04ecb98bf8c";
+      // const partycellId=props.item.partycellId
+      // const roleEmail = await accountService.getEmailByRolePartyCell({roleIdWard,partycellId })
+      // const dataMail = reactive({
+      //   title: "Thông tin phiếu nhận xét của đảng viên",
+      //   content: `<h2>Trân trọng kính chào ông/bà</h2>
+      //             <p>Kính mời quý ông/bà vào hệ thống quản lý đảng viên sinh hoạt nơi cư trú trường công 
+      //             nghệ thông tin và truyền thông xem thông tin phiếu nhận xét của đảng viên <b>${props.item.name}</b> </p>
+      //             <p>Chân thành cảm ơn ông/bà</p>
+      //             <p>Chúc quý ông/bà nhiều sức khỏe</p>
+      //             <p>Trân trọng,</p>
+      //             <p>Admin</p>`,
+      //   mail: roleEmail.join(', '),// Gán danh sách email vào đây
+      // });
 
 
       const signed = await Comment.update(data.item)
@@ -57,16 +54,14 @@ export default {
           alert_success(
             `Đã duyệt phiếu nhận xét của đảng viên`,
           );
-          await mailService.sendmail(dataMail);
-          ctx.emit("signed");
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Đợi 1 giây (thay đổi thời gian cần thiết)
-      window.location.reload();
+          // await mailService.sendmail(dataMail);
+          // ctx.emit("signed");
+          await new Promise(resolve => setTimeout(resolve, 1500)); // Đợi 1 giây (thay đổi thời gian cần thiết)
+          window.location.reload();
         } else {
           alert_error(`Duyện phiếu nhận xét không thành công`, `${signed.msg}`);
         }
     };
-    
-
     return {
         sortedCriterionEvaluations,
         signed,
@@ -76,20 +71,17 @@ export default {
     
 },
 computed: {
-    // Computed property to get the dynamic number based on the last priority
     getDynamicNumber() {
       return this.lastPriority ? parseInt(this.lastPriority) + 1 : null;
     },
   },
 
   watch: {
-    // Watch for changes in sortedCriterionEvaluations and update lastPriority
     sortedCriterionEvaluations: {
       handler(newVal) {
-        // Assuming you want the last priority from the last item in the sortedCriterionEvaluations array
         this.lastPriority = newVal[newVal.length - 1]?.Criterion?.priority || null;
       },
-      immediate: true, // Trigger the handler immediately when the component is created
+      immediate: true,
     },
   },
 }
@@ -120,8 +112,7 @@ computed: {
                         </div>
                     <div class="d-flex  flex-column " style="margin-left: 50px; float: right">
                         <p >ĐẢNG CỘNG SẢN VIỆT NAM </p>
-                        <!----<p style=" text-transform: capitalize;" >{{ item.Hamlet?.name  }}, {{commentById.createdAt}}</p>-->
-                        <p style=" text-transform: capitalize;" >{{ item.Hamlet?.name  }}, 06/12/2023</p>
+                        <p style=" text-transform: capitalize;" >{{ item.Hamlet?.name   }}, {{commentById.createdAt}}</p>
                     </div>
                 </div>
                     <h3>PHIẾU NHẬN XÉT</h3> 
@@ -140,8 +131,6 @@ computed: {
                             </span>
                         </div>
                     </div>
-                    <!-- <p > 4. Nhận xét khác:  <span style="font-weight: bold;">{{ commentById.note }}</span> </p> -->
-                    <!-- <p >7. Nhận xét khác:  <span style="font-weight: bold;">{{ commentById.note }}</span> </p> -->
                     <p v-if="commentById.note">{{ getDynamicNumber }}. Nhận xét khác: <span style="font-weight: bold;">{{commentById.note}}</span></p>
                     <div class="d-flex xn" style="margin-bottom: 50px;">
                         <div class="d-flex col-6">

@@ -66,7 +66,6 @@ body {
 }
 .sidebar {
   background-color: #f5da60;
-  /* background-color: rgb(10, 109, 202); */
   width: 216px;
   height: 43.5rem;
   position: fixed;
@@ -76,7 +75,6 @@ body {
   z-index: 2;
   padding-top: -5rem;
   margin-bottom: -20px;
-  
 }
 .content {
   padding: 20px;

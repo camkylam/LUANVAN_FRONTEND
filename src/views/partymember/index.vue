@@ -10,7 +10,7 @@ import DeleteAll from "../../components/form/delete-all.vue";
 import Add from "./add.vue";
 import Edit from "./edit.vue";
 import View from "./view.vue";
-import Select_Advanced from "../../components/form/select_advanced.vue";
+
 import { reactive, computed, watch, ref, onBeforeMount } from "vue";
 import { useRouter } from "vue-router";
 import postionService from "../../services/position.service";
@@ -20,7 +20,7 @@ import ctyService from "../../services/cty_province.service";
 import districtsServices from "../../services/district.service";
 import wardsServices from "../../services/ward.service";
 import Swal from "sweetalert2";
-import FormWizard from "../../components/form/form-wizard.vue";
+
 import { http_getAll, http_create, http_getOne, http_deleteOne, http_update } from "../../assets/js/common.http";
 import { alert_success, alert_error, alert_delete, alert_warning, alert_delete_wide } from "../../assets/js/common.alert";
 import { formatDate, searchData, updateItems, updateRows, setNumberOfPages, setPagination } from "../../assets/js/common";
@@ -37,10 +37,10 @@ export default {
     DeleteAll,
     Edit,
     View,
-    Select_Advanced,
+   
     Add,
     Mail,
-    FormWizard,
+   
     SelectCDU,
   },
   setup(ctx) {
@@ -50,7 +50,7 @@ export default {
       ],
       viewValue: partymemberModel,
       info: partymemberModel,
-      entryValue: 5,
+      entryValue: 30,
       numberOfPages: 1,
       totalRow: 0,
       startRow: 0,
@@ -114,9 +114,6 @@ export default {
     //FRESH
     const refresh = async () => {
       if (_idPartyMember) {
-        /**
-         * * Tan, tai
-         */
         data.info = await http_getOne(partymemberService, _idPartyMember);
 
         let cellIds = []
@@ -145,9 +142,6 @@ export default {
         }
       }
       else {
-        /**
-         * * Admin -> getAll
-         */
         data.items = await http_getAll(partymemberService);
         for (let value of data.items) {
           value.checked = false;

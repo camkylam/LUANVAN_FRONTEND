@@ -6,7 +6,7 @@ import Dropdown from "../../components/form/dropdown.vue";
 import Select from "../../components/form/select.vue";
 import Add from "../comment/add.vue";
 import CommentForm from "../introduction/assessment_form.vue";
-import Select_Advanced from "../../components/form/select_advanced.vue";
+
 import { ref, onBeforeMount, onMounted } from "vue";
 import Criterion from "../../services/criterion";
 import Comment from "../../services/comment.service";
@@ -22,7 +22,7 @@ export default {
     Pagination,
     Dropdown,
     Select,
-    Select_Advanced,
+   
     Add,
     CommentForm
   },

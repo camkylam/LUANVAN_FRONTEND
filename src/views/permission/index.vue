@@ -1,7 +1,7 @@
 <script>
 import Add from "./add.vue";
 import Edit from "./edit.vue";
-import FormWizard from "../../components/form/form-wizard.vue";
+
 
 import Pagination from "../../components/table/pagination.vue";
 import Dropdown from "../../components/form/dropdown.vue";
@@ -18,7 +18,7 @@ import { http_getAll, http_create, http_getOne, http_deleteOne, http_update } fr
 import { alert_success, alert_error, alert_delete, alert_warning, alert_info, alert_delete_wide, alert_input_text, alert_mail } from "../../assets/js/common.alert";
 import { formatDateTime, formatDate, formatDateTime_2 } from "../../assets/js/common.js";
 
-import { isCreatePermission, isDeletePermission, isReadPermission, isSetPermission } from '../../use/getSessionItem'
+//import { isCreatePermission, isDeletePermission, isReadPermission, isSetPermission } from '../../use/getSessionItem'
 
 
 export default {
@@ -32,7 +32,7 @@ export default {
     DeleteAll,
     Edit,
     Select_Advanced,
-    FormWizard,
+   
   },
   setup(ctx) {
     const data = reactive({
@@ -174,6 +174,7 @@ export default {
         `Xoá quyền`,
         `Bạn có chắc chắn muốn xoá quyền ${data.name} không ?`
       );
+      console.log("alo")
 
       if (isConfirmed == true) {
         const result = await http_deleteOne(Permission, _id);
@@ -302,10 +303,10 @@ export default {
       handleSelectAll,
       deleteMany,
       removeItem,
-      isCreatePermission,
-      isDeletePermission,
-      isReadPermission,
-      isSetPermission,
+      // isCreatePermission,
+      // isDeletePermission,
+      // isReadPermission,
+      // isSetPermission,
     };
   },
 };
@@ -334,25 +335,7 @@ export default {
     <div class="border-hr mb-3"></div>
     <div class="d-flex justify-content-between mx-3 mb-3">
       <div class="d-flex justify-content-start">
-        <Select class="d-flex justify-content-start" :options="[
-          {
-            name: 5,
-            value: 5,
-          },
-          {
-            name: 10,
-            value: 10,
-          },
-          {
-            name: 20,
-            value: 20,
-          },
-          {
-            name: 30,
-            value: 30,
-          },
-        ]" style="width: 125px" :title="`Số bản ghi`" @update:entryValue="(value) => (data.entryValue = value)"
-          :entryValue="data.entryValue" @refresh="(data.entryValue = 'All'), (data.currentPage = 1)" />
+       
         <Search class="ml-3" style="width: 300px" @update:searchText="(value) => (data.searchText = value)"
           :entryValue="data.searchText" @choseSearch="async (value) => (
 
@@ -368,12 +351,12 @@ export default {
       </div>
       <div class="d-flex align-items-start">
         <button type="button" class="btn btn-danger mr-3" data-toggle="modal" data-target="#model-delete-all"
-          :disabled="isDeletePermission() ? false : true">
+         >
           <span id="delete-all" class="mx-2" @click="deleteMany()">Xoá</span>
         </button>
         <!-- <DeleteAll :items="data.items" /> -->
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#model-add"
-          :disabled="isCreatePermission() ? false : true">
+          >
           <span id="add" class="mx-2">Thêm</span>
         </button>
         <Add :items="data.itemAdd" @create="(value) => create(value)" @remove="removeItem" />
@@ -381,7 +364,7 @@ export default {
     </div>
     <!-- Table -->
     <Table :items="setPages" :fields="['Tên quyền', 'Loại quyền']" :labels="['name', 'pTValue']"
-      :showActionList="[false, false, isDeletePermission() ? true : false]" :startRow="data.startRow"
+       :startRow="data.startRow"
       :selectAll="data.selectAll" @selectAll="(value) => handleSelectAll(value)"
       @delete="(value, value1) => deleteOne(value, value1)" @edit="async (value, value1) => (
         (data.editValue = await getOne(value._id)), (data.activeEdit = value1)

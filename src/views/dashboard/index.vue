@@ -23,6 +23,8 @@ import TableEvalueE from "../../components/table/table_dashEvalueE.vue";
 import TableEvalueT from "../../components/table/table_dashEvalueT.vue";
 import TableEvalueG from "../../components/table/table_dashEvalueG.vue";
 import TableEvalueH from "../../components/table/table_dashEvalueH.vue";
+import Introduction from "../introduction/introduction_form.vue";
+import View from "../introduction/view.vue";
 import TableCommentYear from "../../components/table/table_CommentByYear.vue";
 import TableMeet from "../../components/table/table_dashmeet.vue";
 import { formatDate, searchData, updateItems, updateRows, setNumberOfPages, setPagination } from "../../assets/js/common";
@@ -53,7 +55,9 @@ export default {
     TableEvalueH,
     TableCommentYear,
     CommentForm,
-    TableMeet
+    TableMeet,
+    View,
+    Introduction
   },
   setup() {
     const data = reactive({
@@ -89,13 +93,16 @@ export default {
       acceptRecommendation: DashRecommementStatus,
       activeTable: "",
       yearInputValueEvaluation: '',
+      yearInputValueComment: '',
+      yearInputValueMeet: '',
       Evaluation: DashYeareValuation,
       commentYear: DashYeareValuation,
       CommentYearTrue: DashYeareValuationTrue,
       EvaluationTrue: DashYeareValuationTrue,
       commentById: CommentByIdModel,
-
-      Meet: DashYeareValuation
+      introValue: partymemberModel,
+      Meet: DashYeareValuation,
+      commentValue: partymemberModel,
     });
    
     const view = async (value) => {
@@ -104,8 +111,14 @@ export default {
       data.viewValue.birthday = formatDate(data.viewValue.birthday);
     };
     const router = useRouter();
+    const renewIntro = async (value) => {
+      router.push({ name: "Form.recommendation", params: { id: `${value}` } });
+      data.introValue = await PartyMember.get(value);
+      const recommendation = await Recommentdation.get(data.introValue._id)
+     
+    };
     
-    //refresh
+   
     const refresh = async () => {
       const _idPartyMember = sessionStorage.getItem("partymemberId");
       data.info = await http_getOne(PartyMember, _idPartyMember);
@@ -113,15 +126,13 @@ export default {
       cellIds = [data.info.PartyCell._id]
       data.partymember = await PartyMember.getAllByCell({ cellIds })
       data.lengthPartymember = data.partymember?.length;
-      // console.log(data.lengthPartymember)
 
       let partyCellIds=[]
       partyCellIds = [data.info.PartyCell._id]
       const yetrecommendation = await Recommentdation.getAllPartyMember({partyCellIds})
       data.lengthRecommendation = yetrecommendation?.document?.length
       data.yetrecommendation = yetrecommendation.document
-      // console.log(data.lengthRecommendation )
-
+      
       let status=[]
       let partyCellId = []
       partyCellId = [data.info.PartyCell._id]
@@ -129,42 +140,46 @@ export default {
       const recommendations = await Recommentdation.getAllByStatusWithPartycell({status, partyCellId})
       data.lengthRecommendationStatus = recommendations?.document?.length
       data.acceptRecommendation =  recommendations?.document
-      // console.log(data.acceptRecommendation)
+     
+      const yearInputValue = data.yearInputValueComment;
+      const year = yearInputValue;
+      console.log(year )
+
+      const yearInputValueEvaluation = data.yearInputValueEvaluation
+      const yeartrue = yearInputValueEvaluation
+      const yearfalse = yearInputValueEvaluation
+
+      const yearInputMeet = data.yearInputValueMeet
+      const yearmeet = yearInputMeet
+
       
-      ////Evaluetion///
-      const yearInputValue = data.yearInputValueEvaluation;
-      const year = yearInputValue
-      
-      // console.log(yearInputValue)
       const evaluation = await commentService.getByYearAndPartyCell({year,partyCellIds})
-      data.Evaluation = evaluation.criterionEvaluationNameCounts
       data.lengthCommentYear = evaluation?.document?.length
       data.commentYear = evaluation.document
-      // console.log(data.lengthCommentYear)
 
-      const evaluationTrue = await commentService.getByYearAndPartyCellExemptionTrue({year,partyCellIds})
+      const evaluationFalse = await commentService.getByYearAndPartyCellExemptionFalse({yearfalse,partyCellIds})
+      data.Evaluation = evaluationFalse.criterionEvaluationNameCounts
+
+      const evaluationTrue = await commentService.getByYearAndPartyCellExemptionTrue({yeartrue,partyCellIds})
       data.EvaluationTrue = evaluationTrue.criterionEvaluationCountsByCriterion
       data.CommentYearTrue = evaluationTrue.document
-      // console.log(data.CommentYearTrue);
 
-      //////////End//////
-
-
-      const meet = await commentService.getByYearAndPartyCellAndMeet({year, partyCellIds})
+      const meet = await commentService.getByYearAndPartyCellAndMeet({yearmeet, partyCellIds})
       data.Meet = meet.document
-      // console.log(data.Meet)
+      console.log(data.Meet)
+      
 
     };
+    
     const handleBoxClick = (boxType) => {
       data.activeTable = boxType;
-      // console.log(data.activeTable)
     };
 
     const handleGetById = async (id, item) => {
     const rsPartyMember = await commentService.getById(id)
+    console.log(rsPartyMember)
     if(!rsPartyMember.error){
       data.commentById = rsPartyMember.document
-      // console.log(data.commentById)
       data.commentById.createdAt = formatDate(data.commentById.createdAt)
     }
      else {
@@ -175,25 +190,39 @@ export default {
       await refresh();
     });
    const onFormSubmit = async () => {
-      // Validate the year input
-      const yearInput = parseInt(data.yearInputValueEvaluation);
-      
-      if (isNaN(yearInput) || yearInput < 0) {
-        // Show an error message for invalid input
+      const yearInputComment = parseInt(data.yearInputValueComment);
+      if (isNaN(yearInputComment) || yearInputComment < 0) {
         alert_error("Năm không hợp lệ");
         return;
       }
-
-      // Continue with the refresh logic
       await refresh();
     };
+    const onFormSubmitEvaluation = async () => {
+     const yearInputEvaluation = parseInt(data.yearInputValueEvaluation);
+     if (isNaN(yearInputEvaluation) || yearInputEvaluation < 0) {
+       alert_error("Năm không hợp lệ");
+       return;
+     }
+     await refresh();
+   };
+   const onFormSubmitMeet = async () => {
+     const yearInputMeet = parseInt(data.yearInputValueMeet);
+     if (isNaN(yearInputMeet) || yearInputMeet < 0) {
+       alert_error("Năm không hợp lệ");
+       return;
+     }
+     await refresh();
+   };
 
     return {
       data,
       handleBoxClick,
       view,
       onFormSubmit,
-      handleGetById
+      onFormSubmitEvaluation,
+      onFormSubmitMeet,
+      handleGetById,
+      renewIntro
     };
   },
 };
@@ -249,7 +278,6 @@ export default {
     <div v-if="data.activeTable === 'recommendation'">
       <p style="font-size: 25px; text-align: center; font-family: 'Times New Roman', Times, serif; font-weight: bold; padding-top: 25px; padding-bottom: 25px;">ĐẢNG VIÊN CHƯA CÓ THƯ GIỚI THIỆU</p>
       <TableRecommendation
-       
         :yetrecommendation = "data.yetrecommendation"
         :fields="[
           'Tên',
@@ -262,8 +290,10 @@ export default {
       'Quận, huyện',
       'Tỉnh, thành phố',
         ]"
+   @view="(value) => { view(value); }"
+   @renewIntro="(value) => {renewIntro(value);}" 
       />
-      
+      <View :item="data.viewValue"></View>
     </div>
     <!-- TableYetAccept -->
     <div v-if="data.activeTable === 'recommendationstatus'">
@@ -279,17 +309,19 @@ export default {
           'Xã, phường',
           'Quận, huyện',
           'Tỉnh, thành phố',
-        ]"
+        ]"  
+         @view="(value) => { view(value); }"
+        @renewIntro="(value) => {renewIntro(value);}"
       />
-     
+      <View :item="data.viewValue"></View>
     </div>
 
     <div v-if="data.activeTable === 'criterionEvaluation'">
       <p style="font-size: 25px; text-align: center; font-family: 'Times New Roman', Times, serif; font-weight: bold; padding-top: 25px; padding-bottom: 25px;">THỐNG KÊ TIÊU CHÍ ĐÁNH GIÁ NHẬN XÉT THEO NĂM</p>
-      <form @submit.prevent="onFormSubmit">
+      <form @submit.prevent="onFormSubmitEvaluation">
       <div class="d-flex justify-content-between mx-3 mb-3">
         <div class="d-flex align-items-start">
-          <input v-model="data.yearInputValueEvaluation" ref="yearInput" id="yearInput" class="ml-3" style="width: 300px; border: 1px solid var(--gray); border-radius: 5px; position: relative; width: 200%; height: 100%; margin-left: 80px;" placeholder="Nhập năm cần thống kê">
+          <input v-model="data.yearInputValueEvaluation" ref="yearInput" id="yearInput" class="ml-3" style="width: 300px; border: 1px solid var(--gray); border-radius: 5px; position: relative; width: 200%; height: 100%; margin-left: 80px;" placeholder="Nhập năm cần thống kê" required>
           <button type="submit" class="btn btn-info ml-3 mr-3" data-toggle="modal">
             <span class="mx-2" style="color: white">Thống kê</span>
           </button>
@@ -451,7 +483,7 @@ export default {
       <form @submit.prevent="onFormSubmit">
       <div class="d-flex justify-content-between mx-3 mb-3">
         <div class="d-flex align-items-start" style="padding-bottom: 15px;">
-          <input v-model="data.yearInputValueEvaluation" ref="yearInput" id="yearInput" class="ml-3" style="width: 300px; border: 1px solid var(--gray); border-radius: 5px; position: relative; width: 200%; height: 100%;" placeholder="Nhập năm cần thống kê">
+          <input v-model="data.yearInputValueComment" ref="yearInput" id="yearInput" class="ml-3" style="width: 300px; border: 1px solid var(--gray); border-radius: 5px; position: relative; width: 200%; height: 100%;" placeholder="Nhập năm cần thống kê" required>
           <button type="submit" class="btn btn-info ml-3 mr-3" data-toggle="modal">
             <span class="mx-2" style="color: white">Thống kê</span>
           </button>
@@ -476,10 +508,10 @@ export default {
 
     <div v-if="data.activeTable === 'meet'">
       <p style="font-size: 25px; text-align: center; font-family: 'Times New Roman', Times, serif; font-weight: bold; padding-top: 25px; padding-bottom: 25px;">THỐNG KÊ ĐẢNG VIÊN KHÔNG THAM GIA HỌP Ở ĐỊA PHƯƠNG</p>
-      <form @submit.prevent="onFormSubmit">
+      <form @submit.prevent="onFormSubmitMeet">
       <div class="d-flex justify-content-between mx-3 mb-3">
         <div class="d-flex align-items-start" style="padding-bottom: 15px;">
-          <input v-model="data.yearInputValueEvaluation" ref="yearInput" id="yearInput" class="ml-3" style="width: 300px; border: 1px solid var(--gray); border-radius: 5px; position: relative; width: 200%; height: 100%;" placeholder="Nhập năm cần thống kê">
+          <input v-model="data.yearInputValueMeet" ref="yearInput" id="yearInput" class="ml-3" style="width: 300px; border: 1px solid var(--gray); border-radius: 5px; position: relative; width: 200%; height: 100%;" placeholder="Nhập năm cần thống kê" required>
           <button type="submit" class="btn btn-info ml-3 mr-3" data-toggle="modal">
             <span class="mx-2" style="color: white">Thống kê</span>
           </button>

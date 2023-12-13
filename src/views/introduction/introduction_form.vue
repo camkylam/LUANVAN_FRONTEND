@@ -47,9 +47,9 @@ export default {
       }
     }
     const update = async () => {
-      const roleId = "601b19c4-381f-4e44-98b7-e44f09f4f405"
+      const roleIdWard = "601b19c4-381f-4e44-98b7-e44f09f4f405"
       const wardId = props.recommendationById.document.Detailed_Recommendation.Hamlet.Ward._id
-      const roleEmails = await accountService.getEmailFromRoleAndWard({roleId, wardId})
+      const roleEmails = await accountService.getEmailFromRoleAndWard({roleIdWard, wardId})
       // console.log(roleEmails)
       const dataMail = reactive({
         title: "Xác nhận thư giới thiệu cho Đảng viên mới về sinh hoạt tại chi bộ",
@@ -75,10 +75,10 @@ export default {
             alert_success(
               `Đã xác nhận thành công thư giới thiệu`,
             );
-            await mailService.sendmail(dataMail);
-          ctx.emit("update");
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Đợi 1 giây (thay đổi thời gian cần thiết)
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Đợi 1 giây (thay đổi thời gian cần thiết)
             window.location.reload();
+            await mailService.sendmail(dataMail);
+            ctx.emit("update");
           } 
 
           else {
@@ -129,18 +129,16 @@ export default {
           alert_success(
             `Đã chấp nhận đảng viên về sinh hoạt tại nơi cư trú`,
           );
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          window.location.reload();
           const dataMailPromise = mailService.sendmail(dataMail);
           const dataMailMemberPromise = mailService.sendmail(dataMailMember);
           try {
         await Promise.all([dataMailPromise, dataMailMemberPromise]);
         ctx.emit("accept");
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        window.location.reload();
         } catch (error) {
         alert_error(`Lỗi khi gửi email: ${error.message}`);
       }
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Đợi 1 giây (thay đổi thời gian cần thiết)
-          window.location.reload();
         } else {
           alert_error(`Cập nhật thư giới thiệu không thành công`, `${result.msg}`);
         }
@@ -239,9 +237,11 @@ export default {
             </p>
             <p>Kết nạp Đảng vào ngày: <span style="font-weight: bold;">{{ recommendationById.document.PartyMember.dateJoin }}</span>
             </p>
-            <p>Công nhận Đảng viên chính thức ngày: <span style="font-weight: bold;">
-               {{ recommendationById.document.PartyMember.dateOfficial }}
+            
+              <p>Công nhận Đảng viên chính thức ngày: <span style="font-weight: bold;">
+                  {{ recommendationById.document.PartyMember.dateOfficial != null && recommendationById.document.PartyMember.dateOfficial !== undefined && recommendationById.document.PartyMember.dateOfficial !== '01/01/1970' ? recommendationById.document.PartyMember.dateOfficial : '' }}
               </span></p>
+              
             <p>Đang sinh hoạt tại <span>{{ recommendationById.document.PartyMember.PartyCell.name }}</span> Trường Công nghệ thông tin
               và truyền thông, Đại
               học Cần Thơ</p>

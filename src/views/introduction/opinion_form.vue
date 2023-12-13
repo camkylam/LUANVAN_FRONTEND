@@ -7,7 +7,7 @@ import { reactive } from "vue";
 import { isCreateRecommendation, isComfirmRecommendation, isAcceptRecommendation } from "../../use/getSessionItem";
 import opinionService from "../../services/opinion.service";
 import mailService from "../../services/mail.service";
-import { isComfirmOpinion } from "../../use/getSessionItem";
+import { isComfirmOpinion, signedOpinion } from "../../use/getSessionItem";
 import accountService from "../../services/account.service";
 
 export default {
@@ -88,21 +88,21 @@ export default {
     //   }
     // }
     const update = async () => {
-      const roleIdHamlet = "28d7a8f7-c869-4258-88c7-d68c9bf4df9b";
-      const hamletId = props.opiniontById.Recommendation.PartyMember.Hamlet._id
-      const roleEmailHamlet = await accountService.getEmailByRoleHamlet({roleIdHamlet, hamletId});
+      //const roleIdHamlet = "28d7a8f7-c869-4258-88c7-d68c9bf4df9b";
+      //const hamletId = props.opiniontById.Recommendation.PartyMember.Hamlet._id
+      //const roleEmailHamlet = await accountService.getEmailByRoleHamlet({roleIdHamlet, hamletId});
       // console.log(roleEmailHamlet)
-      const dataMailHamlet = reactive({
-        title: "Thư giới thiệu của đảng viên",
-        content: `<p>Trân trọng kính chào ông/bà</p>
-                  <p>Kính mời quý ông/bà vào hệ thống quản lý đảng viên sinh hoạt nơi cư trú trường công 
-                  nghệ thông tin và truyền thông xem thông tin phiếu xin ý kiến của đảng viên <b>${props.opiniontById.Recommendation.PartyMember.name}</b> về sinh hoạt tại nơi cư trú</p>
-                  <p>Chân thành cảm ơn ông/bà</p>
-                  <p>Chúc quý ông/bà nhiều sức khỏe</p>
-                  <p>Trân trọng,</p>
-                  <p>Admin</p>`,
-        mail: roleEmailHamlet.join(', '),// Gán danh sách email vào đây
-      });
+      // const dataMailHamlet = reactive({
+      //   title: "Thư giới thiệu của đảng viên",
+      //   content: `<p>Trân trọng kính chào ông/bà</p>
+      //             <p>Kính mời quý ông/bà vào hệ thống quản lý đảng viên sinh hoạt nơi cư trú trường công 
+      //             nghệ thông tin và truyền thông xem thông tin phiếu xin ý kiến của đảng viên <b>${props.opiniontById.Recommendation.PartyMember.name}</b> về sinh hoạt tại nơi cư trú</p>
+      //             <p>Chân thành cảm ơn ông/bà</p>
+      //             <p>Chúc quý ông/bà nhiều sức khỏe</p>
+      //             <p>Trân trọng,</p>
+      //             <p>Admin</p>`,
+      //   mail: roleEmailHamlet.join(', '),// Gán danh sách email vào đây
+      // });
 
       const _idPartyMember = sessionStorage.getItem("partymemberId");
       data.item.partymemberId = props.item._id,
@@ -115,9 +115,9 @@ export default {
         alert_success(
           `Đã Xác nhận thành công phiếu xin ý kiến`,
         );
-        await mailService.sendmail(dataMailHamlet);
-        ctx.emit("update");
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Đợi 1 giây (thay đổi thời gian cần thiết)
+        // await mailService.sendmail(dataMailHamlet);
+        //ctx.emit("update");
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Đợi 1 giây (thay đổi thời gian cần thiết)
       window.location.reload();
       } else {
         alert_error(`Xác nhận phiếu xin ý kiến không thành công`, `${opinion.msg}`);
@@ -128,7 +128,8 @@ export default {
       data,
       update,
       currentDate: '',
-      isComfirmOpinion
+      isComfirmOpinion,
+      signedOpinion
     }
   },
   mounted() {
@@ -171,8 +172,7 @@ export default {
                         </div>
                         <div class="justify-content-center" style="margin-left: 108px;">
                             <p>ĐẢNG CỘNG SẢN VIỆT NAM</p>
-                            <!-- <p>Cần Thơ, {{ opiniontById?.createdAt }}</p> -->
-                            <p>Cần Thơ, 06/12/2023</p>
+                            <p>Cần Thơ, {{ opiniontById?.createdAt }}</p>
                         </div>
                     </div>
                     <h3>PHIẾU XIN Ý KIẾN</h3>
@@ -196,6 +196,7 @@ export default {
                         data-toggle="modal"
                         @click="update" id="update"
                         v-if="!opiniontById.SentBy?.name"
+                        :disabled="signedOpinion() ? false : true"
                     >
                     <span class="mx-2" style="color: white">Xác nhận</span></button>
                     <button

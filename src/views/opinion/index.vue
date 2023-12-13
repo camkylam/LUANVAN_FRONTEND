@@ -6,14 +6,10 @@ import Dropdown from "../../components/form/dropdown.vue";
 import Select from "../../components/form/select.vue";
 import Add from "../opinion/add.vue";
 import Opinion from "../introduction/opinion_form.vue";
-
-import Select_Advanced from "../../components/form/select_advanced.vue";
 import { alert_success, alert_error, alert_delete, alert_warning, alert_delete_wide } from "../../assets/js/common.alert";
 import { reactive, computed, watch, ref, onBeforeMount } from "vue";
-
 //service
 import PartyMember from "../../services/partymember.service";
-
 import OpinionServices from "../../services/opinion.service";
 import { partymemberModel, recommedationModel, recommenwardsModel, opinionModel, OpinionByIdModel } from "../../assets/js/models"
 import { formatDate, searchData, updateItems, updateRows, setNumberOfPages, setPagination } from "../../assets/js/common";
@@ -24,7 +20,6 @@ export default {
     Pagination,
     Dropdown,
     Select,
-    Select_Advanced,
     Opinion,
     Add
   },
@@ -114,8 +109,7 @@ export default {
       renewOpinions,
       handleDelete,
       handleGetById,
-      isComfirmOpinion,
-      
+      isComfirmOpinion
     }
   }
 }
@@ -132,7 +126,7 @@ export default {
     <div class="border-hr mb-2"></div>
 
     <div class="d-flex menu my-2 mx-2 justify-content-end">
-      <button  type="button" class="btn btn-warning ml-3 mr-3" data-toggle="modal" data-target="#model-add"
+      <button v-if="isComfirmOpinion()" type="button" class="btn btn-warning ml-3 mr-3" data-toggle="modal" data-target="#model-add"
           @click="add">
           <span class="mx-2" style="color: white">Thêm phiếu xin ý kiến</span>
         </button>

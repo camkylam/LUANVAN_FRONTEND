@@ -12,7 +12,7 @@ import Select_Advanced from "../../components/form/select_advanced.vue";
 import { reactive, computed, watch, ref, onBeforeMount } from "vue";
 import { useRouter } from "vue-router";
 import PartyMember from "../../services/partymember.service";
-import FormWizard from "../../components/form/form-wizard.vue";
+
 import { http_getAll, http_create, http_getOne, http_deleteOne, http_update } from "../../assets/js/common.http";
 import { alert_success, alert_error, alert_delete, alert_warning, alert_delete_wide } from "../../assets/js/common.alert";
 import { formatDate } from "../../assets/js/common";
@@ -33,7 +33,7 @@ export default {
     Select_Advanced,
     Add,
     Mail,
-    FormWizard,
+   
     SelectCDU,
   },
   setup(ctx) {

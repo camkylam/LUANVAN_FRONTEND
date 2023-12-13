@@ -21,8 +21,6 @@ export default {
   const create = async () => {
       const roleId = "5f3d3360-417e-41c9-8aa9-d10e290e60a7";
       const roleEmails = await accountService.getEmailByRole({roleId});
-      // console.log(roleEmails)
-      // Tạo đối tượng dataMail sau khi có danh sách email
       const dataMail = reactive({
         title: "Xác nhận thư giới thiệu cho đảng viên",
         content: `<p><span style="text-transform: capitalize;">Trân </span> trọng kính chào ông/bà có vai trò đảng ủy, chi ủy trường công nghệ thông tin và truyền thông</p>
@@ -49,16 +47,16 @@ export default {
           `Thư giới thiệu đã được tạo thành công.`,
           `${recommendation.msg}`
         );
+        await new Promise(resolve => setTimeout(resolve, 1500)); // Đợi 1 giây (thay đổi thời gian cần thiết)
+        window.location.reload();
         await mailService.sendmail(dataMail);
         ctx.emit("create");
 
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Đợi 1 giây (thay đổi thời gian cần thiết)
-        window.location.reload();
+       
       } else {
         alert_error(`Thêm thư giới thiệu không thành công`, `${recommendation.msg}`);
       }
-      // window.location.reload();
-    }
+  }
     return {
       data,
       create,
